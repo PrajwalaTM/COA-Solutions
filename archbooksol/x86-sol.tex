@@ -1,0 +1,767 @@
+\vskip 1cm
+\begin{flushright}
+Solutions by Saumya Sahay $<$saumyasahay98@gmail.com$>$
+\end{flushright}
+\section*{Exercises}
+\vskip 1cm
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+\section*{x86 Machine Model}
+
+
+\begin{ExerciseList}
+
+\Exercise
+What are the advantages of the segmented addressing mode? Why do modern x86 processors
+need the LDT and GDT tables?
+ \Answer  :
+\begin{enumerate}
+\item Protection:Each program can be allocated a certain section of memory .Other programs cannot use this memory, so each program is protected from interference from other programs.
+\item Extended memory: Increases the memory a single program can access.
+\item Virtualmemory: Expands the address space.
+\item Multitasking:Enables the microprocessor to switch from one program to another so the computer can execute several programs at once
+\end{enumerate}
+
+The code, data and stack have their own segments in a x86 processor, thus for program execution we need to access the segments related to a process.
+The LDT being local to a process, is used to access segments that a process uses as each entry is indexed by segment id, contains starting address of segment, and privileges required to access it.
+The GDT  is  a system wide table that is shared by all processes running on machine. For this purpose, it contains pointers to each LDT.\\
+
+\Exercise
+Explain the memory addressing modes in x86.
+\Answer :
+\begin{enumerate}
+\item register-indirect: V $\leftarrow$ [r1] . The register saves the address of the memory location that contains the value.
+\item base-offset : V $\leftarrow$ [r1+offset] . The base memory address is fetched from r1, constant offset is added and the new memory is accessed by the processor.
+\item base-index :V $\leftarrow$ [r1+r2] . The memory address is equal to the sum of register 1 and register 2.
+\item base-index-offset :V $\leftarrow$ [r1+r2+offset] . The memory address contains the value as the sum of r1,r2 and offset.
+\item base-scaled-index-offset :V $\leftarrow$ [r1+(index*scale) +offset]. The base is in register r1.The index is stored in other register which is multiplied by a power of 2. After this, the offset is added.  
+\item memory- direct : V $\leftarrow$ [memory in hexadecimal].
+\end{enumerate}
+
+\Exercise
+Describe the floating point registers and the floating point stack in x86.
+\Answer :
+FP registers : A total of 16 registers
+\begin{enumerate}
+\item 8 general purpose st0 to st7
+\item  FPCR Floating-point control register
+\item  FPSR Floating-point status register
+\item  FPTAG Tag word
+\item  FPIOFF Instruction offset
+\item  FPISEL Instruction selector
+\item  FPDOFF Data offset
+\item  FPDSEL Data selector
+\end{enumerate}
+
+FP STACK-The FPU has 8 registers---st0 to st7, formed into a stack called FP stack.FPU instructions push numbers onto the stack from memory, are acted upon by fp instructions and then popped off the stack back to memory.\\
+
+\Exercise[difficulty=1]
+We can specify an entire 32 bit immediate in a single instruction in x86. Recall that this was not possible in ARM
+and \simplerisc. What are the advantages and disadvantages of having this feature in the ISA?
+\Answer:
+Advantages : 
+\begin{enumerate}
+\item No memory reference other than instruction fetch is required to obtain the operand, thus saving one memory or cache cycle in the instruction cycle.
+\item Specifying an immediate reduces the number of lines of code in a given algorithm.
+\end{enumerate}
+Disadvantage :
+\begin{enumerate}
+\item Inflexible: The value retrieved is hard coded and non-changeable, since modification of code once it is running is improper and in many systems impossible.
+\end{enumerate} 
+
+\Exercise [difficulty=1]
+We claim that using a stack based architecture makes the software very portable. It does not need to be aware of 
+the number and semantics of registers in an ISA. Comment on this statement, and try to find other reasons
+for preferring a stack based machine.
+\Answer:A stack based architecture can get by with just two visible registers, the top of the stack and the next instruction address. It simply works by popping data, performing instructions on it and pushing it back to the stack. The other registers have no immediate need. So, it does not need to be aware of the number and semantics of registers in ISA.
+
+Reasons for preferring a stack based machine is:
+\begin{enumerate}
+\item Very compact object code: Stack machines have much smaller instructions than the other styles of machines.  
+\item Able to use Out-of-Order Execution: Out-of-order execution in stack machines seems to reduce or avoid many theoretical and practical difficulties.
+\item Simple compilers: Compilers for stack machines are simpler and quicker to build than compilers for other machines
+\item Fast operand access: Since there are no operand fields to decode, stack machines fetch each instruction and its operands at same time. So compared to register machines, stack machines can omit operand fetching stage.
+\item Minimal processor state: A machine with an expression stack can get by with just two visible registers, the top-of-stack address and the next-instruction address.
+\end{enumerate}
+
+\Exercise[difficulty=2]
+Given an arithmetic expression containing floating point operands, how can we evaluate it using a floating point
+stack? What should be the order of loading and operating on operands? 
+[HINT: A regular arithmetic operation such as -- (1 + 2.5) * 3.9 -- is called an infix expression. To evaluate
+expressions using a stack, we need to convert it into a postfix expression of the form -- 1 2.5 + 3.9 *. Here,
+we first push 1 and 2.5 on the stack, add the result, push 3.9 on the stack, and multiply the first two entries.
+The reader should read more about postfix expressions in textbooks on discrete mathematics.]
+\Answer :
+We use stack to first convert infix to postfix notation by the stack and then calculate value of postfix expression using a stack.
+Transforming Infix to Postfix :
+Let Q be the arithmetic expression in infix notation and  P be the equivalent postfix expression.
+\begin{enumerate}
+\item Push left paranthesis onto Stack and add right parenthesis to the end of Q.
+\item Scan Q from left to right and repeat steps 3 to 6 for each element of Q until STACK is empty
+\item If an operand is encountered add it to P
+\item If a left parenthesis is encountered, push onto STACK
+\item If an operator op is encountered , then:
+     Repeatedly pop from STACK and add to P each operator on the top of STACK which has the same precedence as or higher precedence than op\\
+     Add op to STACK\\
+---End of If structure
+\item If a right parenthesis is encountered, then:
+Repeatedly pop from STACK and add to P each operator until a left parenthesis is encountered.\\
+Remove the left parenthesis.\\
+---End of If structure
+---End of Step 2 loop
+\item Exit
+\end{enumerate}
+Evaluation of postfix :
+\begin {enumerate}
+\item Add a right parenthesis at the end of P
+\item Scan P from left to right and repeat steps 3 and 4 for each element of P until parenthesis is encountered.
+\item If an operand is encountered , put it on STACK .
+\item If an operator op is encountered
+               Remove the top two elements of STACK, A being the top element and B being the other one.\\
+               Evaluate B op A.\\
+               Place the result of this evaluation back on STACK.\\
+---End of If structure
+---End of Step 2 loop
+\item Pop the top element of STACK to get the final value of the mathematical expression.
+\item Exit\\
+\end{enumerate}
+
+
+\end{ExerciseList}
+\section*{Assembly Programming using Integer Instructions}
+
+\begin{ExerciseList}
+\Exercise Write x86 assembly code snippets  to compute the following: 
+
+\begin{enumerate}[i) ]
+\item $a + b + c$
+\item $a + b - c/d$
+\item $(a + b)*3 - c/d$
+\item $a/b - (c*d)/3$
+\item $(a\ll2) - (b\gg 3)$ (($\ll$ (left shift logical), $\gg$ (left shift arithmetic))
+\end{enumerate}
+\Answer :
+
+\begin{enumerate}
+\item \begin{Verbatim}[frame=single]
+mov eax,[a]
+add eax,[b]
+add eax,[c]
+\end{Verbatim}
+\item 
+\begin{Verbatim}[frame=single]
+mov eax,[c]
+mov ebx,[d]
+idiv ebx
+mov ebx,[a]
+mov ecx,[b]
+add ebx,ecx
+sub ebx,eax
+\end{Verbatim}
+\item
+\begin{Verbatim}[frame=single]
+mov eax,[a]
+mov ebx,[b]
+imul ecx,[eax+ebx],3
+mov eax,[c]
+mov ebx,[d]
+idiv ebx
+sub ecx,eax
+\end{Verbatim}
+\item 
+\begin{Verbatim}[frame=single]
+mov eax,[c]
+mov ebx,[d]
+imul ebx,eax
+mov eax,3
+idiv ebx
+mov ebx,eax
+mov eax,[a]
+mov ecx,[b]
+idiv ecx
+sub eax,ebx
+\end{Verbatim}
+\item \begin{Verbatim}[frame=single]
+mov eax,[a]
+shl eax,2
+mov ebx,[b]
+shr eax,3
+sub eax,ebx
+\end{Verbatim}
+\end{enumerate}
+\Exercise
+Write an assembly program to convert an integer stored in memory from the little endian to the big endian format.
+\Answer:
+\begin{Verbatim}[frame=single]
+mov eax,[num]
+mov ebx,eax
+shr ebx,24
+mov ecx,0
+or ecx,ebx
+mov ebx,eax
+and ebx,0x000000ff
+shl ebx,24
+or ecx,ebx
+mov ebx,eax
+and ebx,0x00ff0000
+shr ebx,8
+or ecx,ebx
+mov ebx,eax
+and ebx,0x0000ff00
+shl ebx,8
+or ecx,ebx
+\end{Verbatim}
+\Exercise 
+Compute the factorial of a positive number using an
+iterative algorithm.
+\Answer  :
+\begin{Verbatim}[frame=single]
+	mov eax,[num]
+	mov ebx, 2
+	mov ecx, 1
+.fact:
+       imul ecx,ebx
+       inc ebx
+       cmp ebx,eax
+       jle.fact
+exit:
+\end{Verbatim}
+\Exercise 
+Compute the factorial of a positive number using a
+recursive algorithm.
+\Answer  :
+\begin{Verbatim}[frame=single]
+		mov eax,[num]
+function:
+               mov ebx, 1
+               cmp, eax, 1
+               je.return
+               push eax
+               dec eax
+               call function
+               pop eax
+               imul ebx,eax
+.return:
+               ret
+\end{Verbatim}
+\Exercise 
+Write an assembly program to find if a number is prime.
+\Answer  :
+\begin{Verbatim}[frame=single]
+	mov eax,[num]
+	mov ebx, 2
+	mov ecx , eax
+.prime:
+           mov edx, 0 
+           idiv ebx
+           cmp edx, 0
+           je.notprime
+           inc ebx
+           mov eax, ecx
+           cmp ebx, eax
+           jl.prime
+           mov eax, 1
+           jmp.exit
+.notprime:
+           mov eax 0
+.exit:
+\end{Verbatim}
+
+\Exercise Write an assembly program to test if a number is a perfect
+square. 
+\Answer :
+\begin{Verbatim}[frame=single]
+	mov eax,[num]
+	mov ebx, 0
+	mov ecx, 1
+.square:
+        mov edx,ecx
+        imul edx,ecx
+        cmp edx,eax
+        je .perfect
+        inc ecx
+        cmp ecx,eax
+        jne .square
+        mov ebx,0
+.perfect:
+        mov ebx, 1
+.exit:
+\end{Verbatim}
+
+\Exercise Write an assembly program to test if a number is a perfect
+cube.
+\Answer :
+\begin{Verbatim}[frame=single]
+	mov eax,[num]
+	mov ebx, 0
+	mov ecx, 1
+.cube:
+        mov edx,ecx
+        imul edx,ecx
+	imul edx,ecx
+        cmp edx,eax
+        je .perfect
+        inc ecx
+        cmp ecx,eax
+        jne .cube
+        mov ebx,0
+.perfect:
+        mov ebx, 1
+.exit:
+\end{Verbatim}
+\Exercise Given a 32-bit integer, count the number of 1 to 0 transitions in it. 
+\Answer :
+\begin{Verbatim}[frame=single]
+main:    
+       mov eax, [num]   
+       mov ecx,32   
+       mov ebx,0   
+.loop: shr eax, 1
+        jc .loop
+.loop2: jz .exit
+        shr eax, 1
+        jnc .loop2
+        inc ebx
+        jmp .loop
+.exit:  
+\end{Verbatim}
+\Exercise Write an assembly program that checks if a 32-bit number is a palindrome.
+A palindrome is a number which is the same when read from both sides. For example, 1001 is a 4 bit palindrome.
+\Answer :
+\begin{Verbatim}[frame=single]
+mov eax,[num]
+mov ebx,0x00000001
+mov ecx,0x80000000
+mov edx,31
+.loop:  test eax,ecx
+	jnz .one
+
+.zero:  test eax,ebx
+	jz .next
+	jmp .no
+
+.next:  sub edx,1
+	cmp edx,0
+	je .yes
+	shr ecx,1 
+	shl ebx,1
+	jmp .loop
+
+.yes:   mov ecx,1
+	jmp .exit
+
+.one:   test eax,ebx
+	jnz .next
+
+.no:    mov ecx,0
+.exit:
+\end{Verbatim}
+\Exercise Write an assembly program to examine a 32-bit 
+value stored in $eax$ and count the number of contiguous sequences of 1s. For example, the value:
+\begin{displaymath}
+0111 0001 0001 1110 1100 0111 0001 1111 
+\end{displaymath}
+contains six sequences of 1s. Write the final value in register r2.
+\Answer :
+\begin{Verbatim}[frame=single]
+ mov eax, [num]
+ mov ecx,32
+ mov ebx,0 
+.loop1:
+	dec ecx
+	cmp ecx,0 
+	jl .exit
+	shr eax,1 
+	jc .loop2
+	jmp .loop1
+.loop2: 
+	shr eax, 1
+	dec ecx
+	jc .loop2
+	inc ebx
+	jmp .loop1
+.exit:
+\end{Verbatim}
+\Exercise
+Write an assembly program to count the number of 1's in a 32 bit number.
+\Answer :
+\begin{Verbatim}[frame=single]
+    mov eax, [num]
+    mov ecx,32
+    mov edx,0 
+.loop:dec ecx
+      cmp ecx,0
+      jl .exit
+      shl eax,1
+      jnc .loop
+      inc edx
+      jmp .loop
+.exit:
+ 
+\end{Verbatim}
+\Exercise[difficulty=1] 
+Write an assembly program to find the smallest number that is a sum of
+two different pairs of cubes. [Note: 1729 is known as the Hardy-Ramanujan number. $1729 =12^3 + 1^3
+= 10^3 + 9^3$]. 
+
+\Exercise[difficulty=2]
+In some cases, we can rotate an integer to the right by $n$  positions (less than or equal to 31) so that we obtain the same number.
+For example: a 8-bit number 11011011 can be right rotated by 3 or 6
+places to obtain the same number.
+Write an assembly program
+to {\em efficiently} count the number of ways we can rotate a number to the right such that the result is 
+equal to the original number. 
+\Answer :
+\begin{Verbatim}[frame=single]
+mov eax, [num]    
+    mov ecx,32  
+    mov ebx,0  
+    mov edx,eax  
+.loop:  
+    dec ecx  
+    cmp ecx,1  
+    jl .exit  
+    ror eax,1  
+    cmp edx,eax  
+    jne .loop  
+    inc ebx  
+    jmp .loop  
+.exit:  
+\end{Verbatim}
+\Exercise[difficulty=3]
+Write an assembly language program to find the greatest common divisor of two binary numbers $u$ and $v$.
+Assume the two inputs (positive integers) 
+to be available in $eax$ and $ebx$. Store the result in $ecx$.
+[HINT: The gcd of two even numbers $u$ and $v$ is $2*gcd(u/2,v/2)$]
+\Answer :
+\begin{Verbatim}[frame=single]
+mov eax,[num1]
+mov ebx,[num2]
+mov ecx,1
+.cases: cmp eax,0 ;num2=0
+	je .exit
+	cmp ebx,0 ;num1=0 
+ 	je .case1	
+	cmp eax,ebx ;num1=num2
+	je .exit
+
+.case2: mov edx,eax  ;num1 is even
+	test edx,1
+	jnz .case3
+
+.check: sar eax,1
+	mov edx,ebx  ;both even
+	test edx,1
+	jz .mul
+	jmp .cases
+
+.case3: mov edx,ebx  ;only num2 is even 
+	test edx,1
+	jnz .case4
+	sar ebx,1
+	jmp .cases
+	
+.case4: mov edx,eax  ;both odd
+	and eax, ebx
+	test eax, 1
+	jz .cases
+	mov eax,edx
+	cmp eax,ebx
+	jl .exchange
+	sub eax,ebx
+	sar eax,1
+	jmp .cases
+	
+.mul:   sar ebx,1  ;counter for 2*gcd(even/2,even/2)
+	sal ecx,1
+	jmp .cases
+
+.case1: xchg eax,ebx
+	jmp .exit
+
+.exchange: xchg eax,ebx
+	   jmp .case4
+.exit:     imul ecx,ebx
+\end{Verbatim}
+\Exercise
+Write an assembly program that uses string instructions to set the value of a range of memory addresses to 0.
+Reduce the code size by using the $rep$ prefix.
+\Answer :
+\begin{Verbatim}[frame=single]
+cld  
+mov eax 0  
+mov ecx 10  
+rep stosd
+\end{Verbatim}
+
+\end{ExerciseList}
+
+
+\section*{Assembly Programming using Floating Point Instructions}
+
+\begin{ExerciseList}
+\Exercise
+Why is the $mov$ instruction a very versatile instruction?
+\Answer
+The mov instruction in x86 is able to move the contents of a register, immediate or even memory location into another memory location or register(Exception:Source and Destination can't both be memory locations).This way the mov instruction can achieve the function of loading and storing memory values because it accepts memory operands, preventing us from dedicating any seperate load/store instruction in x86 and allowing us to fuse the functionality of three RISC instructions into a single CISC instruction.
+
+\Exercise
+Write an assembly program to find the roots of the equation $x^2 - x - 1 = 0$. Recall that the roots
+of a quadratic equation of the form $ax^2 + bx+ c$ are equal to $\frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$.
+\Answer :
+\begin{Verbatim}[frame=single]
+fld dword [b]
+fmul st0
+fstp dword [esp]
+fld dword [a]
+fld dword [c]
+fmul st1
+fadd st0
+fadd st0
+fld dword [esp]
+fsub st0,st1
+comi st0,0
+jl .no_real
+fsqrt st0
+fld dword [b]
+fneg st0
+fld dword [esp]
+fadd st0,st1
+fstp dword [esp]
+fld dword [a]
+fadd st0
+fld dword [esp]
+fdiv st1
+\end{Verbatim}
+
+\Exercise Verify the following trigonometric identities for random values of $\theta$ using assembly
+programs. Use the
+$rdrand$ instruction that loads a random 32 bit integer into a register.
+
+\vskip 1cm
+
+\begin{center}
+\begin{tabular}{||l|l||}
+\hline
+\hline
+S. No. & Identity \\
+\hline
+1 & $sin^2(\theta) + cos^2(\theta) = 1$ \\
+\hline
+2 & $sin \left ( \frac{\pi}{2} - \theta \right ) = cos(\theta)$ \\
+\hline
+3 & $cos(\theta + \phi) = cos(\theta)cos(\phi) - sin(\theta)sin(\phi)$ \\
+\hline
+4 & $sin(\theta) + sin(\phi) = 2 sin \left ( \frac{\theta + \phi}{2} \right ) cos \left ( \frac{\theta - \phi}{2} \right
+)$  \\
+\hline
+\hline
+\end{tabular}
+\end{center}
+\Answer :
+\begin{enumerate}
+\item \begin{Verbatim}[frame=single]
+	fld dword [theta]
+	fsin
+	fmul st0
+	fstp dword [esp]
+	fld dword [theta]
+	fcos
+	fmul st0
+	fld dword [esp] 
+	fadd st0,st1
+	fld dword [one]
+	fsub st0,st1
+	fabs
+	fld dword [threshold]
+	fsub st0,st1
+	ja .equal
+	mov eax, 0
+	jmp .exit
+
+.equal:
+	mov eax, 1
+.exit:
+\end{Verbatim}
+\item \begin{Verbatim}[frame=single]
+
+	fld dword [theta]
+	fld dword [pi]
+	fdiv dword [two]
+	fsub st0,st1
+	fsin
+	fstp dword [esp]
+	fld dword [theta]
+	fcos
+	fld dword [esp] 
+	fsub st0, st1
+	fld dword[threshold]
+	comi st0,st1
+	ja.equal
+	mov eax, 0
+	jmp .exit
+
+.equal:
+	mov eax, 1
+.exit:
+\end{Verbatim}
+
+\item \begin{Verbatim}[frame=single]
+
+	fld dword [theta] 
+	fcos
+	fld dword [fi]
+	fcos
+	fmul st0,st1
+	fstp dword [esp]
+	fld dword [theta]
+	fsin
+	fld dword [fi]
+	fsin
+	fmul st0,st1
+	fld dword [esp]
+	fsub st0,st1
+	fstp dword [esp] 
+	fld dword [theta]
+	fld dword [fi]
+	fadd st0,st1
+	fcos
+	fld dword [esp]  
+	fsub st0, st1
+	fld dword [threshold]
+	fcomi st0, st1
+	ja .equal
+	mov eax, 0
+	jmp .exit
+
+.equal:
+	mov eax, 1
+.exit:
+\end{Verbatim}
+
+\item \begin{Verbatim}[frame=single]
+	fld dword [theta]
+	fsin
+	fld dword [fi]
+	fsin
+	fadd st0,st1
+	fstp dword [esp]
+	fld dword [theta]
+	fld dword [fi]
+	fadd st0,st1
+	fdiv dword [two]
+	fsin
+	fadd st0
+	fld dword [theta]
+	fld dword [fi]
+	fsub st0,st1
+	fcos
+	fmul st0,st2
+	fld dword [esp]  
+	fsub st0, st1
+	fld dword [threshold]
+	fcomi st0, st1
+	ja .equal
+	mov eax, 0
+	jmp .exit
+
+.equal:
+	mov eax, 1
+.exit:
+
+\end{Verbatim}
+\end{enumerate}
+\Exercise
+Assume that we have two arrays of 10 floating point numbers, where the starting addresses of the arrays are stored in
+$eax$ and $ebx$ respectively. Find the arithmetic mean (AM), geometric mean (GM), and harmonic mean (HM) using 
+assembly routines. Verify that $AM \ge GM \ge HM$. 
+
+\Exercise[difficulty=1]
+Let us compute the value of the constant, $e$ using an assembly program.
+Use the following mathematical expression.
+\[
+	e = 1 + \frac{1}{1!} + \frac{1}{2!} + \frac{1}{3!} + \frac{1}{4!} + \ldots + \frac{1}{10!}
+\]
+
+\Exercise[difficulty=2]
+For random values of $\theta$ show that following identity holds:
+\[
+sin(\theta) = \theta - \frac{\theta^3}{3!} + \frac{\theta^5}{5!} - \ldots
+\]
+
+\end{ExerciseList}
+
+\section*{x86 ISA Encoding}
+
+\begin{ExerciseList}
+\Exercise
+What are the values of the SIB and ModR/M bytes for the instruction, {\em mov eax, [eax + ebx*4]}?
+\Answer :
+ModR/M :0x08 \\
+SIB    :0x98\\
+\Exercise
+What are the values of the SIB, ModR/M, and displacement bytes for the instruction, {\em mov eax, [eax + ebx*4 + 32]}?
+\Answer :
+ModR/M :0x44\\
+SIB    :0x0x98\\
+Displacement bytes:0x20\\   
+\Exercise
+What is the value of the $ModR/M$ byte when we need to specify a memory address that does not have any base
+or index registers? Assume that the value of the $reg$ field is 000. 
+\Answer:
+ModR/M: 0x03
+
+\Exercise[difficulty=1] Assume that we have an instruction that has a single operand of the form $[ebp]$. How do we encode it
+using the fields in the ModR/M byte?
+\Answer:
+ModR/X :0x48
+
+\Exercise[difficulty=1] What are the values of the SIB and ModR/M bytes for the instruction, {\em mov eax, [ebx*4]}?
+\Answer:
+ModR/M:0x04\\
+SIB   :0x9D  
+
+\end{ExerciseList}
+
+
+\subsection*{Design Problems}
+
+\begin{ExerciseList}
+\Exercise
+Write an x86 assembly emulator that can read an assembly file, and execute each assembly instruction one by one.
+
+\Exercise
+Use the GNU compiler to generate an assembly file for a test program written in C using the command, {\em gcc -S
+-masm=intel}. 
+
+\end{ExerciseList}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

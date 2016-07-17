@@ -1,0 +1,545 @@
+\vskip 2cm
+\begin{flushright}
+Solutions by Saumya Sahay $<$saumyasahay98@gmail.com$>$
+\end{flushright}
+\section*{Exercises}
+\vskip 1cm
+
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+\section*{Assembly Language Concepts}
+
+\begin{ExerciseList}
+
+\Exercise What is the advantage of the register indirect addressing mode over the memory direct
+addressing mode?
+\Answer :
+\begin{enumerate}
+\item The advantages of register indirect addressing mode is that it makes accessing data dynamic rather than static as in the case of direct addressing mode.
+ode.
+\end{enumerate}
+
+\Exercise 
+When is the base-offset addressing mode useful?
+\Answer :
+Base offset is useful to access fields of a structure or objects.
+
+\Exercise
+Consider the base-scaled-offset addressing mode, which directs the hardware to automatically
+multiply the offset by 4. When is this addressing mode useful?
+\Answer :
+Based-scaled offset modeis useful while traversing stacks and complexdata structures.
+
+\Exercise Which addressing modes are preferable in a machine with a large number of registers?
+\Answer :
+Base index offset, Base index addressing modes,Register indirect addressing.
+
+\Exercise Which addressing modes are preferable in a machine with very few registers?
+\Answer :
+Immediate addressing,Memory-direct addressing modes.
+
+\Exercise Assume that we are constrained to have at the most two operands per instruction. Design
+a format for arithmetic instructions such as add and multiply in this setting.
+\Answer :
+\begin{enumerate}
+\item add R0,R1 (stores the value of R0+R1 in R0)
+\item sub R0,R1 (subtracts R1 from R0 and stores in R0)
+\end{enumerate}
+
+
+\end{ExerciseList}
+
+\section*{Assembly Programming}
+
+\begin{ExerciseList}
+
+\Exercise Write simple assembly code snippets in \simplerisc to compute the following: 
+
+\begin{enumerate}[i) ]
+\item $a + b + c$
+\item $a + b - c/d$
+\item $(a + b)*3 - c/d$
+\item $a/b - (c*d)/3$
+\item $(a\ll2) - (b\gg 3)$ (($\ll$ (left shift logical), $\gg$ (left shift arithmetic))
+\end{enumerate}
+
+\Answer :
+We store the values of a,b,c and d in registers R0,R1,R2and R3 respectively.\\
+\begin{enumerate}
+\item \begin{Verbatim}[frame=single]
+add R0,R0,R1
+add R0,R2,0
+\end{Verbatim}
+\item \begin{Verbatim}[frame=single]
+div R2,R2,R3
+add R0,R0,R1
+sub R0,R0,R2
+\end{Verbatim}
+\item \begin{Verbatim}[frame=single]
+add R0,R0,R1
+mul R0,R0,3
+div R2,R2,R3
+sub R0,R0,R2
+\end{Verbatim}
+\item \begin{Verbatim}[frame=single]
+div R0,R0,R1
+mul R2,R2,R3
+div R2,R2,3
+sub R0,R0,R2
+\end{Verbatim}
+\item
+\begin{Verbatim}[frame=single]
+lsl R0,R0,2
+asr R1,R1,3
+sub R0,R0,R1
+\end{Verbatim}
+\end{enumerate}
+
+\Exercise Write a program to load the value $0xFFEDFC00$ into $r0$. Try to minimise
+the number of instructions.
+\Answer :
+\begin{Verbatim}
+movh R0,0xFFED
+addu R0,R0,0xFC00
+\end{Verbatim}
+
+\Exercise
+Write an assembly program to set the $5^{th}$ bit 
+of register $r0$ to the value of the $3^{rd}$ bit of $r1$. Keep the rest of the contents
+of $r0$ the same. The convention
+is that the LSB is the first bit, and the MSB 
+is the $32^{nd}$ bit. (Use less than or equal to 5 $SimpleRisc$ assembly statements) 
+\Answer:
+\begin{Verbatim}[frame=single]
+and R1,R1,4
+lsl R1,R1,2
+and R0,R0,0xffef
+or R0,R0,R1
+\end{Verbatim}
+
+\Exercise
+Write a program in \simplerisc assembly to convert an integer stored in memory from the little endian to the big endian format.
+\Answer :
+\begin{Verbatim}[frame=single]
+mov R0,R1
+lsl R2,R0,24
+lsr R3,R0,24
+movu R6,0xff00
+movh R7,0x00ff
+and R4,R0,R6
+lsl R4,R4,8
+and R5,R0,R7
+lsR R5,R5,8
+add R3,R3,R5
+add R3,R3,R4
+add R2,R2,R3
+st R2,[R1]
+.print R2
+\end{Verbatim}
+
+\Exercise 
+Write a program in \simplerisc assembly to compute the factorial of a positive number using an
+iterative algorithm.
+\Answer:
+\begin{Verbatim}[frame=single]
+mov R1,1
+mov R2,R0
+.loop: 
+	mul R1,R1,R2
+	sub R2,R2,1
+	cmp R2,1
+	bgt .loop
+.exit: .print R1
+
+\end{Verbatim}
+
+\Exercise 
+Write a program in \simplerisc assembly to find if a number is prime.
+\Answer:
+\begin{Verbatim}[frame=single]
+mov R2,2
+.loop:
+	mod R3,R1,R2
+	cmp R3,0
+	beq .no
+	add R2,R2,1
+	cmp R2,R1
+	bgt .loop
+	mov R0,1
+	b .exit
+.no:
+	mov R0,0
+.exit:
+	.print R0
+
+\end{Verbatim}
+\Exercise Write a program in \simplerisc assembly to test if a number is a perfect
+square. 
+\Answer :
+\begin{Verbatim}[frame=single]
+mov R2,0
+.loop:
+	mul R3,R2,R2
+	cmp R3,R1
+	beq .yes
+	add R2,R2,1
+	cmp R1,R2
+	bgt .loop
+	mov R0,0
+	b .exit
+.yes:
+	mov R0,1
+.exit:
+	.print R0
+\end{Verbatim}
+\Exercise Given a 32-bit integer in $r3$,
+write a \simplerisc assembly program to count the number of 1 to 0 transitions in it. 
+\Answer: 
+\begin{Verbatim}[frame=single]
+movu R1,0x0001
+mov R2,32
+mov R4,0
+mov R5,0
+mov R6,R0
+.loop1:
+	cmp R2,0
+	beq .exit
+	lsr R6,R0,R5
+	and R3,R6,R1
+	sub R2,R2,1
+	add R5,R5,1
+	cmp R3,1
+	beq .loop1
+.loop2:
+	cmp R2,0
+	beq .exit
+	lsr R6,R0,R5
+	and R3,R6,R1
+	sub R2,R2,1
+	add R5,R5,1
+	cmp R3,0
+	beq .loop2
+	add R4,R4,1
+	b .loop1
+.exit:
+	.print R4
+\end{Verbatim}
+\Exercise[difficulty=1] 
+Write a program in \simplerisc assembly to find the smallest number that is a sum of
+two different pairs of cubes. [Note: 1729 is the Hardy-Ramanujan number. $1729 =12^3 + 1^3
+= 10^3 + 9^3$].
+\Answer :
+\begin{Verbatim}[frame=single]
+
+.main:
+	mov r0,0
+	mov r4,0
+	mov r5,0
+	mov r6,0
+.loop1:
+	mov r3,0
+	mov r1,1
+.loop2:
+	mul r4,r1,r1
+	mul r4,r4,r1
+	cmp r4,r0
+	bgt .break2
+	mov r2,1
+.loop3:
+	cmp r2,r1
+	bgt .break3
+	mul r5,r2,r2
+	mul r5,r5,r2
+	add r6,r4,r5
+	cmp r6,r0
+	beq .check
+	b .next
+.check:
+	add r3,r3,1
+	cmp r3,2
+	beq .break1
+.next:
+	add r2,r2,1
+	b .loop3
+.break3:
+	add r1,r1,1	
+	b .loop2
+.break2:
+ 	add r0,r0,1
+   	b .loop1
+.break1:
+	.print r0
+
+\end{Verbatim}
+
+\Exercise Write a \simplerisc 
+assembly program that checks if a 32-bit number is a palindrome.
+Assume that the input is available in $r3$. The program should set $r4$
+ to 1 if it is a palindrome, otherwise $r4$ should contain a 0.
+A palindrome is a number which is the same when read from both
+ sides. For example, 1001 is a 4 bit palindrome.
+\Answer :
+\begin{Verbatim}[frame=single]
+	mov R0,1044480
+	mov R3,0
+	mov R4,31
+	movu R2,0x0001
+	mov R5,0
+	andu R1,R0,0xffff
+	.loop:
+		and R3,R2,R1
+		lsl R2,R2,1
+		lsl R3,R3,R4
+		add R5,R5,R3
+		sub R4,R4,2
+		cmp R4,0
+		bgt .loop
+		lsr R0,R0,16
+		lsr R5,R5,16
+		sub R0,R5,R0
+		cmp R0,0
+		beq .palin
+		mov R0,0
+		b .exit
+	.palin:
+		mov R0,1
+	.exit:
+	
+\end{Verbatim}
+\Exercise Design a \simplerisc program that examines a 32-bit 
+value stored in $r1$ and counts the number of contiguous sequences of 1s. For example, the value:
+\begin{displaymath}
+0111 0001 0001 1110 1100 0111 0001 1111 
+\end{displaymath}
+contains six sequences of 1s. Write the result in $r2$.
+\Answer :
+\begin{Verbatim}[frame=single]
+movu R1,0x0001
+mov R2,32
+mov R4,0
+mov R5,0
+mov R6,R0
+.loop1:
+	cmp R2,0
+	beq .exit
+	lsr R6,R0,R5
+	and R3,R6,R1
+	sub R2,R2,1
+	add R5,R5,1
+	cmp R3,0
+	beq .loop1
+	add R4,R4,1
+.loop2:
+	cmp R2,0
+	beq .exit
+	lsr R6,R0,R5
+	and R3,R6,R1
+	sub R2,R2,1
+	add R5,R5,1
+	cmp R3,1
+	beq .loop2
+	b .loop1
+.exit:
+	.print R4
+
+\end{Verbatim}
+\Exercise[difficulty=2]
+Write a program in \simplerisc assembly to subtract two 64 bit numbers stored
+in two registers.
+
+\Exercise[difficulty=2]
+In some cases, we can rotate an integer to the right by $n$  positions (less than or equal to 31) so that we obtain the same number.
+For example: a 8-bit number 11011011 can be right rotated by 3 or 6
+places to obtain the same number.
+Write an assembly program
+to {\em efficiently} count the number of ways we can rotate a number to the right such that the result is 
+equal to the original number. 
+\Answer:
+\begin{Verbatim}[frame=single]
+mov R0,1431655765
+mov R1,31
+mov R3,R0
+.loop:	cmp R1,0
+	beq .exit
+	lsl R2,R0,31
+	lsr R0,R0,1
+	sub R1,R1,1
+	movu R5,0xffff
+	addh R5,R5,0x7fff
+	and R0,R5,R0
+ 	or R0,R0,R2
+	cmp R3,R0
+ 	beq .inc
+	 b .loop
+.inc :  
+	 add R4,R4,1
+	 b .loop
+.exit : 
+	.print R4
+\end{Verbatim}
+\Exercise[difficulty=2]
+A number is known as a cubic Armstrong number if the sum of the cubes of the decimal digits is equal to the
+number itself. For example, 153 is a cubic Armstrong number (153 = $1^3 + 5^3 + 3^3$). You are given a number in register, $r0$,
+and it is known to be between 1 and 1 million. Can you write a piece of assembly code in $SimpleRisc$ to find out
+if this number is an Armstrong number. Save 1 in $r1$ if it is an Armstrong number; otherwise, save 0.
+\Answer :
+\begin{Verbatim}[frame=single]
+mov R4,R1
+mov R2,0
+.loop:
+	mod R2,R1,10
+	mul R3,R2,R2
+	mul R3,R3,R2
+	add R0,R0,R3
+	div R1,R1,10
+	cmp R1,0
+	bgt .loop
+	cmp R4,R0
+	beq .arms
+	mov R5,0
+	b .exit
+.arms:
+	mov R5,1
+.exit:
+	.print R5
+\end{Verbatim}
+
+\Exercise[difficulty=3]
+Write a \simplerisc assembly language program to find the greatest common divisor of two binary numbers $u$ and $v$.
+Assume the two inputs (positive integers) 
+to be available in $r3$ and $r4$. Store the result in $r5$.
+[HINT: The gcd of two even numbers $u$ and $v$ is $2*gcd(u/2,v/2)$]
+\Answer: 
+\begin{Verbatim}[frame=single]
+mov R0,42
+mov R1,98
+mov R4,1
+ 	cmp R0,0
+ 	beq .exit
+	cmp R1,0 
+	beq .case1
+.cases:	
+	cmp R0,R1
+	bgt .exchange
+	mod R3,R1,R0
+	cmp R3,0
+	beq .exit
+
+.case2:
+	mod R3,R0,2
+	cmp R3,0
+	beq .divide1
+	b .case3
+
+.divide1:
+	div R0,R0,2
+	mod R3,R1,2
+	cmp R3,0
+	beq .check
+	b .cases
+
+.check:
+	div R1,R1,2
+	mul R4,R4,2
+	b .cases
+
+
+.case3:
+	mod R3,R1,2
+	cmp R3,0
+	beq .divide2
+	
+	sub R0,R1,R0
+	div R0,R0,2
+	b .cases
+
+.divide2:
+	div R1,R1,2
+	b .cases
+
+.case1: 
+	mov R0,R1
+	b .exit
+
+.exchange:
+	mov R3,R0
+	mov R0,R1
+	mov R1,R3
+	b .cases
+.exit:
+	mul R0,R0,R4
+\end{Verbatim}
+
+\end{ExerciseList}
+
+\section*{Instruction Set Encoding}
+
+\begin{ExerciseList}
+
+\Exercise Encode the following \simplerisc instructions:
+
+\begin{enumerate}[i) ]
+\item $sub$ $sp$, $sp$, 4
+\item $mov$ $r4$, $r5$
+\item $addu$ $r4$, $r4$, 3
+\item $ret$
+\item $ld$ $r0$, $[sp]$
+\item $st$ $r4$, $8[r9]$
+\end{enumerate}
+\Answer :
+\begin{enumerate}
+\item Binary: 00001 1 1110 1110 000000000000000100\\
+Hexadecimal : 0x0FB80004  
+\item Binary: 01000 0 0100 0000 000000000000000101\\
+Hexadecimal:0x41000005
+\item Binary: 00000 1 0100 0100 010000000000000011\\
+Hexadecimal: 0x05110003
+\item Binary: 10100\\
+Hexadecimal: 0x00000014
+\item Binary:01110 1 0000 1110 000000000000000000\\
+Hexadecimal : 0x74380000
+\item Binary:01111 1 0100 1001 000000000000001000\\
+Hexadecimal : 0x7G240008
+\end{enumerate}
+
+\end{ExerciseList}
+\section*{Design Problems}
+\begin{ExerciseList}
+\Exercise
+
+Design an emulator for the \simplerisc ISA. The emulator reads an assembly program line by line, checks each
+assembly statement for errors, and executes it. 
+Furthermore, define two assembler directives namely $.print$, and $.encode$ to print data on the screen.
+The $.print$ directive takes a register or memory location as input. When the emulator encounters the $.print$
+directive, it prints the value in the register or memory location to the screen. Similarly, when the emulator
+encounters the $.encode$ directive it prints the 32 bit encoding of the instruction on the screen. Additionally,
+it needs to also execute the instruction.
+
+\end{ExerciseList}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

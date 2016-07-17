@@ -1,0 +1,721 @@
+\section*{Exercises}
+\vskip 1cm
+
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+\section*{Overview of Multiprocessor Systems}
+
+\begin{ExerciseList}
+
+\Exercise
+Differentiate between {\em strongly coupled}, and {\em loosely coupled} multiprocessors. 
+\Answer
+Running multiple unrelated programs in parrallel on a multiprocessor is known as loosely coupled multiprocessing.
+Here,the dependencies between the programs is negligible. 
+Running a set of programs in parallel that share their memory space,data,code,file and network connections is known as strongly coupled multiprocessing.There is strong degree of overlapping between different programs. 
+\Exercise
+Differentiate between {\em shared memory}, and {\em message passing} based multiprocessors. 
+\Answer
+In shared memory based multiprocessors, all the individual programs see the same view of the memory system. If program A changes the value of x to 5 then program B immediately sees the change. This paradigm is more suitable for strongly coupled multiprocessors.
+In the message passing setting,multiple programs communicate among each other by passing messages.This paradigm is more suitable for loosely coupled multiprocessors.
+\Exercise
+Why is the evolution of multi core processors a direct consequence of Moore's Law?
+\Answer
+The Moore's Law predicts that the number of transistors on a chip are expected to double every one to two years.
+
+\Exercise
+The fraction of the potentially parallel section in a program is 
+0.6. What is the maximum speedup that we can achieve over a single core processor,
+if we run the program on a quad core processor? Assume that the CPI remains the same
+in both cases. 
+\Answer
+Speed Up is given by the following formula:
+\begin{Verbatim}
+S= Tseq/Tpar=1/[fseq+(1-fseq)/P]
+where fseq is the fraction of time taken in the sequential part of the program.
+
+S=10/7
+
+\end{Verbatim}
+
+
+\Exercise
+You need to run a program, 60\% of which is strictly sequential, 
+while the rest 40\% can be parallelised over a maximum of 4 cores. You 
+have 2 machines:
+\begin{enumerate}[(a) ]
+ \item A single core machine running at 3.2 GHz
+ \item A 4-core machine running at 2.4 GHz
+\end{enumerate}
+Which machine is better if you have to minimise the total 
+time taken to run the program? Assume that the two machines have the same IPC
+and only differ in the clock frequency and the number of cores.
+
+\Answer
+Machine (a) takes 1.07 times more time to run the above program than machine (b). Hence, the 4-core machine running at 2.4 GHz
+is better in this case.
+
+\Exercise[difficulty=1]
+Consider a program, which has a sequential and a parallel portion. The sequential portion is 40\% and the parallel
+portion is 60\%. Using Amdahl's law, we can compute the speedup with $n$ processors, as $S(n)$. However, Amdahl's law has
+the issue of diminishing returns. Hence, we define a utility function, $g(n)$, of the form:
+
+\[
+g(n) = e^{-n/3} (2n^2 + 7n + 6) 
+\]
+
+The buyer wishes to maximise $S(n) \times g(n)$. What is the optimal number of processors, $n$ ?
+
+\Exercise
+Define the terms: SISD, SIMD, MISD, MIMD. Give an example of each type of machine.
+
+\Answer
+\begin{itemize}
+ \item SISD (Single Instruction, Single Data) refers to architecture where a processor executes a single instruction stream, 
+ to operate on data stored in a single memory. Example: Regular single pipeline processor
+ \item SIMD (Single instruction, Multiple Data) refers to architecture where a processor executes a single instruction stream, 
+ to operate on multiple data points simultaneously. Example: Graphics processor.
+ \item MISD (Multiple Instruction, Single Data) refers to architecture where many functional units perform different operations 
+ on the same data. Example: Fault-tolerant computers executing the same instructions redundantly in order to detect and mask errors.
+ \item MIMD (Multiple Instruction, Multiple Data) refers to architecture where a number of processors function asynchronously and
+ independently on different pieces of data. Example: Present day multi-core processors with separate L1 caches.
+\end{itemize}
+
+\Exercise
+What are the two classes of MIMD machines introduced in this book?
+\Answer
+The first is SPMD(Single Program Multiple Data) and the second is MPMD(multiple program multiple data)
+\end{ExerciseList}
+
+\section*{Coherence and Consistency}
+\begin{ExerciseList}
+\Exercise
+What are the axioms of cache coherence?
+\Answer
+
+The two axsioms of cache coherence are:
+\item Completion A write must ultimately complete.
+\item Order All the writes to the same memory address need to be seen by all the threads in the same order.
+\Exercise
+Define sequential and weak consistency.
+\Answer
+\item A memory is sequentially consistent if the outcome of the execution of a set of parallel threads is equivalent to that of a single processor executing instructions from all the threads in some order. It is a memory model whose set of possible outcomes are those that can be generated by interleaving a set of threads in program order.
+\item A weakly consistent memory model doesnot obey SC. It typically allows arbitrary memory orderings.
+\Exercise
+Is the outcome (t1,t2) = (2,1) allowed in a system with coherent memory? \\
+
+\begin{tabular}{cc}
+\begin{minipage}{0.5\textwidth}
+Thread 1:
+\begin{Verbatim}
+x = 1;
+x = 2;
+\end{Verbatim}
+\end{minipage}
+
+& 
+\begin{minipage}{0.5\textwidth}
+Thread 2:
+\begin{Verbatim}
+t1 = x;
+t2 = x;
+\end{Verbatim}
+\end{minipage}
+\end{tabular}
+
+\Exercise
+Assume that all the global variables are initialised to 0, and all variables local to a thread start with `t'.
+What are the possible values of $t1$ for a sequentially consistent system, and a weakly consistent system?
+ (source~\cite{shared-mem-tut})\\
+
+\begin{tabular}{cc}
+\begin{minipage}{0.5\textwidth}
+Thread 1:
+\begin{Verbatim}
+x = 1;
+y = 1;
+\end{Verbatim}
+\end{minipage} 
+
+&
+
+\begin{minipage}{0.5\textwidth}
+Thread 2:
+\begin{Verbatim}
+while(y == 0){}
+t1 = x;
+\end{Verbatim}
+\end{minipage}
+\end{tabular}
+
+
+\Exercise
+Is the outcome (t1,t2) = (1,1) possible in a sequentially consistent system? \\
+
+\begin{tabular}{cc}
+
+\begin{minipage}{0.5\textwidth}
+Thread 1:
+\begin{Verbatim}
+x = 1;
+if(y == 0) 
+	t1 = 1;
+\end{Verbatim}
+\end{minipage}
+&
+
+\begin{minipage}{0.5\textwidth}
+Thread 1:
+\begin{Verbatim}
+y = 1;
+if(x == 0) 
+	t2 = 1;
+\end{Verbatim}
+\end{minipage}
+\end{tabular}
+
+\Exercise
+
+Is the outcome $t1 \ne t2$ possible in a sequentially consistent system? (source~\cite{shared-mem-tut})\\
+
+\begin{tabular}{cccc}
+
+\begin{minipage}{0.25\textwidth}
+Thread 1:
+\begin{Verbatim}
+z = 1;
+x = 1;
+\end{Verbatim}
+\end{minipage}
+
+&
+
+\begin{minipage}{0.25\textwidth}
+Thread 2:
+\begin{Verbatim}
+z = 2;
+y = 1;
+\end{Verbatim}
+\end{minipage}
+
+& 
+
+\begin{minipage}{0.25\textwidth}
+Thread 3:
+\begin{Verbatim}
+while (x != 1) {}
+while (y != 1) {}
+t1 = z;
+\end{Verbatim}
+\end{minipage}
+&
+
+\begin{minipage}{0.25\textwidth}
+Thread 4:
+\begin{Verbatim}
+while (x != 1) {}
+while (y != 1) {}
+t2 = z;
+\end{Verbatim}
+\end{minipage}
+\end{tabular}
+
+
+\Exercise[difficulty=1]
+Is the outcome (t1 = 0) allowed in a system with coherent memory with atomic writes? Consider both sequential and weak
+consistency?
+
+\begin{tabular}{ccc}
+
+\begin{minipage}{0.3\textwidth}
+Thread 1:
+\begin{Verbatim}
+x = 1;
+\end{Verbatim}
+\end{minipage}
+
+&
+\begin{minipage}{0.3\textwidth}
+Thread 2:
+\begin{Verbatim}
+while(x != 1) {}
+y = 1;
+\end{Verbatim}
+\end{minipage}
+&
+
+\begin{minipage}{0.3\textwidth}
+Thread 3:
+\begin{Verbatim}
+while (y != 1) {}
+t1 = x;
+\end{Verbatim}
+\end{minipage}
+\end{tabular}
+
+
+\Exercise[difficulty=1]
+Consider the following code snippet for implementing a {\em critical section}. A critical section is a
+region of code that can only be executed by one thread at any single point of time. Assume that
+we have two threads with ids 0 and 1 respectively. The function $getTid()$ returns the id 
+of the current thread. 
+
+\begin{Verbatim}[frame=single]
+void enterCriticalSection() {
+	tid = getTid();
+	otherTid = 1 - tid;
+	interested[tid] = true;
+	flag = tid;
+
+	while ( (flag == tid) && (interested[otherTid] == 1) ) {}
+}
+
+void leaveCriticalSection{
+	tid = getTid();
+	interested[tid] = false;
+}
+\end{Verbatim}
+
+Is it possible for two threads to be in the critical section at the same point of time? 
+
+\Exercise
+In the snoopy protocol, why do we write back data to the main memory upon a $M$ to $S$ transition?
+\Answer
+Consider a situation with two processors, X and Y, with a memory location in $M$ state for X and in I state for Y. X has modified the contents of
+the location. Suppose Y wants to read, so the state of the location becomes $S$ for both X and Y. Now, both X and Y evict this page, so the
+changes done by X get lost. Suppose we decide to write back on eviction from $S$ state, then we are unnecessarily writing back the same 
+data two times (or n times for n processors). Therefore, the best way is to write back from $M$ to $S$ transition. 
+
+\Exercise
+Assume that two nodes desire to transition from the $S$ state to the $M$ state at exactly the same
+point of time. How will the snoopy protocol ensure that only one of these nodes enters the $M$
+state, and finishes its write operation? What happens to the other node?
+
+\Answer
+Whenever a node wants to write to a location which is not exclusive or not modified to itself, it sends a 
+{\em Request For Ownership (RFO)}, which is a combined read and invalidate broadcast. This operation is exclusive, and therefore
+only one node will successfully be able to get the ownership, while the other with transition to I state.
+
+
+\Exercise
+The snoopy protocol clearly has an issue with scalability. If we have 64 cores with a private cache
+per core, then it will take a long time to broadcast
+a message to all the caches. Can you propose solutions to circumvent this problem?
+
+\Answer
+Instead of broadcasting the message to each and every node, the nodes can send the message to a central node (or a group of
+central nodes which communicate with each other). The central node can selectively broadcast the message to the nodes which
+are actually using that location. For this, the central node(s) will have to maintain a table which would have the mapping the
+nodes with each memory location.
+
+
+\Exercise
+Let us assume a cache coherent multiprocessor system. The L1 cache is private and the coherent L2 cache
+is shared across the processors. Let us assume that the system issues a lot of I/O requests. Most of the I/O
+requests perform DMA (Direct Memory Access) from main memory. It is possible that the I/O requests
+might overwrite some data that is already present in the caches. In this case we need to extend the cache
+coherence protocol that also takes I/O accesses into account. Propose one such protocol.
+
+\Answer
+Whenever there is a DMA write to a particular memory location, 
+an invalidation request can be issued to that memory location,
+and the nodes sharing that location will move to invalid state.
+ In case of DMA read, a cache flush (or write back) request has 
+to be sent so that the IO gets the most recent copy of the data.
+
+\Exercise
+Let us define a new state in the traditional $MSI$ states based snoopy protocol.
+The new $E$ state refers to the
+``exclusive'' state, in which a processor is sure that no other cache contains the block
+in a valid state. Secondly, in the $E$ state, the processor hasn't modified the block yet.
+What is the advantage of having the $E$ state? How are evictions handled in the $E$ state? 
+
+
+\Answer:
+$E$ state indicates that the data at that location is present only in the
+current cache, and it matches with its copy in the main memory. Therefore if it
+is evicted in $E$ state, it can just be discarded. Thus, it saves the
+additional
+work of writing back to main memory.
+ 
+
+\Exercise
+Show the state transition diagrams for a MSI protocol with a directory. You need to show the following:
+\begin{enumerate}
+	\item Structure of the directory
+	\item State transition diagram for events received from the host processor.
+	\item State transition diagram for events received from the directory.
+	\item State transition diagram for an entry in the directory (if required).
+\end{enumerate}
+
+\Exercise
+Assume that we have a system with private L1 and L2 caches. The L1 layer is not coherent. However, the L2 layer
+maintains cache coherence. How do we modify our $MSI$
+snoopy protocol to support cache coherence for the entire system?
+
+\Exercise
+In the snoopy protocol, when should a processor actually perform the write operation? Should it perform immediately, or
+after the block has transitioned to the $M$ state. What happens if a block has transitioned to the $M$ state, and before the
+processor performs a write, a write miss arrives on the bus? How should the basic protocol be modified to take this case
+into account?
+
+\Exercise[difficulty=1]
+Assume that a processor wants to perform an atomic exchange operation between two memory locations $a$ and
+$b$. $a$ and $b$ are
+shared variables, and cannot be allocated to registers. How will you modify the $MSI$ coherence protocol to support this
+operation? Before proceeding with the answer think about what are the things that can go wrong. An exchange is
+essentially equivalent to the following sequence of operations: (1) temp = a; (2) a = b; (3) b = temp. If a read arrives
+between operations (2) and (3) it might get the wrong value of b. We need to prevent this situation.
+
+\Exercise[difficulty=2]
+Assume that we want to implement an instruction called $MCAS$. The $MCAS$ instruction
+takes $k$ (known and bounded) memory locations as arguments, a set of $k$ old values,
+and a set of $k$ new values. Its pseudo-code is shown below. We assume here
+that $mem$ is a hypothetical array representing the entire memory space.
+
+\begin{Verbatim}
+/* multiple compare and set */
+boolean MCAS(int memLocs[], int oldValues[], int newValues[]){
+	/* compare */
+	for(i=0; i < k; i++) {
+		if(mem[memLocs[i]] != oldValues[i]) {
+			return false;
+		}
+	}
+
+	/* set */
+	for(i=0; i < k; i++) {
+		mem[memLocs[i]] = newValues[i];		
+	}
+	
+	return true;
+}
+\end{Verbatim} 
+The challenge is to implement this instruction such that it appears to execute instantaneously.
+Let us look at some subtle cases. Assume that we want to write (4,5,6) to three memory locations
+if their previous contents are (1,2,3). It is possible that after writing 4, and 5, there is a 
+small delay. During this time another thread reads the three memory locations, and 
+concludes that their values are 4,5, and 3 respectively. This result is incorrect because it violates
+our assumption that $MCAS$ executes instantaneously. We should either read (1,2,3) or (4,5,6).
+
+Now, let us look at the case of reading the three memory locations. Let us say that their
+initial values are 1,2, and 0. Our $MCAS$ instruction reads the first two locations and 
+since they are equal to the old values, proceeds to the third location. Before reading it,
+a store operation from another thread changes the values of the three locations as follows.
+(1,2,0) $\rightarrow$ (5,2,0) $\rightarrow$ (5,2,3). Subsequently, the $MCAS$ instruction
+takes a look at the third memory location and finds it to be 3. Note that the three memory
+locations were never equal to (1,2,3). We thus arrive at a wrong conclusion.
+
+How should we fix these problems? We want to implement a $MCAS$ instruction purely in hardware,
+which provides an illusion of instantaneous execution. It should be free of deadlocks, and should
+complete in a finite amount of time. How can we extend our coherence protocols to implement it?
+\Answer
+Steps in the basic answer: 
+\begin{enumerate}
+\item We need a dedicated buffer (MCAS buffer) that saves all the memory locations, old values, and new values of
+the MCAS instruction. Once the MCAS instruction completes, it is removed from the buffer.
+\item We need to load all the blocks corresponding to the memory locations  in the $M$ state. 
+\item Once all the blocks are loaded in the $M$ state, we read their values.
+If there is a mismatch, then the MCAS instruction returns a false. 
+\item If we have a match, then the processor updates all the memory locations with the new values.
+\item The MCAS instruction returns a true.
+\end{enumerate}
+
+Maintaining atomicity: 
+\begin{enumerate}
+\item If a block has been loaded in the $M$ state as a part of processing the MCAS instruction,
+ and the MCAS instruction is in progress, we
+say that it is {\em locked}. 
+\item A block is {\em unlocked} when the associated MCAS instruction completes (returns true or false).
+\item We can find out if a block is locked or not by querying the MCAS buffer.
+\item While a block is locked, we do not process requests from other threads for that block. Other threads have to wait.
+In the case of a directory protocol, the processor either does not reply to the directory, or asks it to
+wait. In the case of a snoopy protocol, the owner processor sends a NAK (negative acknowledgement) message
+on the bus, asking the requesting cache to try later.
+\item Once a block is unlocked, requests from other threads for the block can be processed.
+\end{enumerate}
+
+
+Avoiding Deadlocks: 
+\begin{enumerate}
+\item Two phase locking. Acquire all the locks for blocks in ascending order of block addresses.
+\item Release all the locks instantaneously by deleting the entry in the MCAS buffer.
+\item This strategy ensures that we do not have any deadlocks because any cyclic dependence would require
+a processor to violate the ascending order of acquiring locks.
+\end{enumerate}
+
+
+\Exercise[difficulty=3]
+Assume a processor that has a sequentially consistent(SC) memory. We implement SC by waiting for each memory request to
+complete before issuing the next request. Now, assume that we modify the architecture by allowing a processor to read a
+value that the immediately preceding instruction has written without waiting for it to complete. Prove that the memory system
+still follows SC.
+
+
+\Exercise[difficulty=3]
+Assume a processor with a weak consistency model. Let us run a ``properly labelled'' program on it.
+A {\em properly labelled}(PL) program does not allow conflicting accesses (read-write, write-read, or write-write)
+to a shared variable at the same time. For example, the following code sequence is not 
+properly labelled because it allows $x$ to be modified concurrently.  
+
+\begin{tabular}{cc}
+\begin{minipage}{0.4\textwidth}
+Thread 1:
+\begin{Verbatim}
+x = 0
+\end{Verbatim}
+\end{minipage}
+
+&
+\begin{minipage}{0.4\textwidth}
+Thread 2:
+\begin{Verbatim}
+x = 1
+\end{Verbatim}
+\end{minipage}
+
+\end{tabular}
+
+In reality, the coherence protocol orders one write access before the other. Nevertheless, 
+both the threads {\bf try} to modify $x$ concurrently at the programmer's level. This is precisely the behaviour
+that we wish to avoid. 
+
+In a PL program, two threads do not {\bf try} to modify $x$ at the same time. This is achieved
+by having two magic instructions known as {\em lock} and {\em unlock}. Only one thread
+can lock a memory location at any point of time. If another thread tries to lock the location
+before it is unlocked, then it stalls till the lock is free. If multiple threads are waiting
+on the same lock, only one of them is given the lock after an $unlock$ instruction. Secondly,
+both the $lock$ and $unlock$ instructions have a built in $fence$ operation, and all the $lock$
+and $unlock$ instructions execute in program order. The PL version
+of our program is as follows: \\
+
+
+\begin{tabular}{cc}
+
+\begin{minipage}{0.4\textwidth}
+Thread 1:
+\begin{Verbatim}
+lock(x)
+x = 0
+unlock(x)
+\end{Verbatim}
+\end{minipage}
+
+&
+
+\begin{minipage}{0.4\textwidth}
+Thread 2:
+\begin{Verbatim}
+lock(x)
+x = 1
+unlock(x)
+\end{Verbatim}
+\end{minipage}
+\end{tabular}
+
+We can thus think of a lock-unlock block as sequential block that can only be executed by one
+thread at a given time. Moreover, assume that a lock-unlock block can only have one memory
+instruction inside it.
+
+Now, prove that all PL programs running on a weakly consistent machine have a sequentially
+consistent execution. In other words we can interleave the memory access of all the threads such
+that they appear to be executed by a single cycle processor that switches among the threads. 
+[HINT: Construct access graphs for your system, and prove that they are acyclic.]
+\Answer
+Let us create nodes and edges as explained in the problem. However, let us not create edges to signify
+program order. Let us assume that there is a cycle in the resulting graph, $G$. 
+
+Any thread that has nodes in this cycle, needs to have at least two nodes that are a part of the cycle.
+This is because edges across threads are introduced when there is a write $\rightarrow$ read dependence.
+Since one instruction cannot do the job of both reading, and writing, we need at least two nodes. 
+For thread, $t_i$, let the earliest node (in program order) that is a part of the cycle be $A$, and 
+the latest node be $B$. 
+
+Now, $A$ needs to be a read access, and $B$ needs to be a write access. There has to be a path
+from $A$ to $B$ because the lock-unlock blocks associated with the nodes execute in program order.
+This is guaranteed by the embedded fence instructions. Hence, we can say that $A$ happens before $B$.
+In other words, $B$ starts its execution after $A$ finishes its execution. Hence, we cannot have a path
+from $B$ to $A$ since this amounts to going backwards in time.
+
+Thus, we can conclude that there are no cycles in $G$. Now, let us add the rest of the edges
+between consecutive instructions in the same thread to form Graph, $G'$. These edges signify program order. 
+If $G'$ does not have a cycle, then we can arrange all the nodes in a sequential order, and the
+execution is sequentially consistent.
+
+Let us assume to the contrary that there is a cycle ($C$) in $G'$. Let us consider a thread, $t_i$, that has nodes
+in the cycle. Nodes that have edges to nodes in other threads have to be lock-unlock blocks by
+definition. Hence, each regular (non lock-unlock) node is contained within
+a pair of lock-unlock blocks in $C$. 
+Let us now consider only the lock-unlock blocks in $C$. Let us further look at two consecutive lock-unlock
+blocks($A$ and $B$) in $t_i$
+that are a part of the cycle. The path from $A$ to $B$ passes through regular nodes, which are not
+connected to nodes in other threads. We can thus eliminate edges to regular nodes
+and add an edge directly from $A$ to $B$.
+We still have a cycle. If we eliminate all such nodes, then we have a cycle that purely consists
+of lock-unlock nodes. Graph, $G$, would also have had this cycle because it also did not consider
+program order edges between regular nodes. However, we proved  the reverse.
+Hence, $G'$ cannot have a cycle.
+
+Thus, the execution is sequentially consistent.
+
+
+\end{ExerciseList}
+
+
+\section *{Multithreading}
+
+\begin{ExerciseList}
+
+
+\Exercise
+What is the difference between a fine grained and coarse grained multithreaded machine?
+
+\Answer
+In fine grained multi-threading, the instructions of different threads are interleaved and executed to achieve instruction-level
+parallelism. Where as, in coarse grained multi-threading, switch to an instruction of different thread takes place only on costly
+stalls, like L2 cache miss. Coarse grain multi-threading thus implements thread-level parallelism.
+
+
+\Exercise
+Describe a simultaneous multithreaded (SMT) processor in detail.
+
+\Exercise
+Describes the steps that we need to take to ensure that a SMT processor executes correctly.
+
+\Exercise
+Assume a mix of workloads in a 4-way SMT processor. 2 threads are computationally intensive, 1 thread
+is I/O intensive, and the last thread sleeps for a long time. Design an efficient instruction execution scheme.
+
+\end{ExerciseList}
+
+
+\section*{Interconnection Networks}
+\begin{ExerciseList}
+
+\Exercise
+What is the bisection bandwidth and diameter of a 2D $n\times n$ mesh?
+
+\Answer
+$n$
+
+\Exercise
+What is the bisection bandwidth and diameter of a 3D $n\times n \times n$ mesh?
+
+\Exercise
+What is the diameter of a ring containing $n$ nodes? Give a precise answer that holds for even and
+odd $n$.
+\Answer
+$\left \lfloor \frac{n}{2} \right \rfloor$
+
+
+\Exercise
+What is the bisection bandwidth and diameter of a hypercube of order $n$.
+
+\Answer
+Bisection bandwidth $ = 2^{n-1}$\\
+Diameter = $n$
+
+
+\Exercise
+What is the bisection width and diameter of a $n \times n \times n$,
+3D torus? 
+
+\Answer
+For even $n$, bisection bandwidth = $4n^2$. For odd $n$, it does not exist.\\
+Diameter = $3\times \left \lfloor \frac{n}{2} \right \rfloor$
+
+
+\Exercise
+What is the bisection bandwidth and diameter of a clique of $n$ nodes ($n$ is even)?
+In a clique, all pairs of nodes are connected.
+
+\Answer
+Bisection bandwidth $= \frac{n^2}{4}$\\
+Diameter = 1
+
+\Exercise[difficulty=2]
+Assume we have a $n\times n$ mesh. There are $n^2$ routers, 
+and each processor is connected to one router. 
+Note that at any point of time, a router can only store 1 message. It will discard a message only if
+the message gets stored in another router. In our previous example, router $(i,j)$ will keep the message until
+it has been delivered and stored at a neighbouring router such as $(i+1,j)$.  
+Now, an interesting deadlock situation can develop. Let us assume the following scenario. 
+
+\begin{itemize}
+\item (1,1) wants to send a message to (1,2).
+\item (1,2) wants to send a message to (2,2).
+\item (2,2) wants to send a message to (2,1).
+\item (2,1) wants to send a message to (1,1).
+\end{itemize}
+
+In this case all the four nodes have 1 message each. They are not able to forward the packet to the next node
+because, the next node already stores a packet, and is thus busy. Since there is a cyclic wait, we have a deadlock.
+Design a message routing protocol between a source and destination node that is provably deadlock free.
+\end{ExerciseList}
+
+
+\section*{Vector and Graphics Processors}
+
+\begin{ExerciseList}
+
+\Exercise
+What is the advantage of vector processors over scalar processors?
+
+\Exercise
+Why are vector load-store instructions easy to implement in systems that have caches with large block sizes?
+
+\Exercise
+How can we efficiently implement a scatter-gather based load-store unit?
+
+\Exercise
+What is a predicated instruction, and how does it help speed up a vector processor?
+
+\Exercise[difficulty=1]
+Assume that we have a processor with a 32 entry vector register file. We wish to add two arrays that have
+17 entries each. How can we implement this operation, with the \simplerisc vector instructions introduced
+in the chapter? Feel free to introduce new vector instructions if required.
+
+\Exercise[difficulty=1]
+Design a dedicated SIMD hardware unit to sort $n$ integers in roughly $n$ time steps by using the bubble
+sort algorithm. You have a linear array of $n$ 
+processors connected end to end. Each processor is capable of storing a single integer, and has some logic inside it. Design
+the logic for each processor and explain the overall working of the system.
+
+\Answer
+Let $In$ be input pin, $Out$ be the output pin, and $M$ be the memory to store a single instruction. Each processor should have 
+the following logic:
+\begin{Verbatim}[frame = single]
+ if (In <= M):
+    Out = In
+ else:
+    Out = M
+    M = In
+\end{Verbatim}
+
+The input integers are fed from the input pin of first processor. Each processor works on clock edge and is connected to the same clock.
+We start getting integers in ascending order after $(2n+1)$ clock cycles form the output pin of the last processor. This hardware is
+also known as systolic sorter.
+
+\Exercise
+Where does the graphics processor fit in the Flynn's taxonomy?
+
+\Exercise
+Explain the notion of a {\em warp}, in a GPU.
+
+\Exercise[difficulty=1]
+The movement of data between the CPU and GPU is a slow process, and limits the
+gains of a GPU. Propose solutions to this problem.
+
+\end{ExerciseList}
+
+\section*{Design Problems}
+
+\begin{ExerciseList}
+\Exercise
+Write a program to sort a billion integers using OpenMP, CUDA, and MPI. 
+
+\Exercise
+Implement a distributed shared memory system on a cluster of computers 
+connected via an Ethernet LAN.
+\end{ExerciseList}

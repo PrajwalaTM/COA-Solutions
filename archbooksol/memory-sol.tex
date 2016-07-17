@@ -1,0 +1,464 @@
+\section*{Exercises}
+\vskip 1cm
+
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+\section*{Overview}
+
+\begin{ExerciseList}
+
+\Exercise
+Define temporal locality, and spatial locality.
+\Answer
+a) Temporal Locality:
+It is a concept that states that if a resource is accessed at some point of time, then most likely it will be accessed again in a short time interval.\\
+b) Spatial Locality:
+It is a concept that states that if a resource is accessed at some point of time,then most likely similar resources will be accessed in the near future.
+
+\Exercise
+Experimentally verify that the log-normal distribution is a heavy tailed
+distribution. What is the implication of a heavy tailed distribution in the context of
+the stack distance and temporal locality?
+\Answer
+Heavy tailed distribution implies that the distribution is heavily skewed towards smaller stack distances;however large distances are not uncommon, in a graph where we plot the histrogram of stack distances.
+
+\Exercise
+Define the term, {\em address distance}. Why do we find the nearest match in the
+last $K$ accesses?
+\Answer
+Akin to stack distance, the adress distance is the difference in the memory address of a given memory access, and the closest address in the set of the last K memory accesses.
+Programs typically access different regions of the main memory in the same time interval.There is clearly spatial locality here,in the sense that consecutive iterations access consecutive array elements.However to quantify it,we need to search for the closest access over the last K accesses.
+\Exercise How do we take advantage of temporal locality in the memory system?
+\Answer
+We take advantage of temporal locality in memory system by creating a hierarchical memory system.
+The L1 cache is a small SRAM array(8-64KB), the L2 cache is a larger SRAM array(128KB-4MB). Then, there is a large DRAM array containing all the memory locations, this is known as the main memory or physcial memory. Whenever there is a memory access, the processor checks the L1 cache first, which is small and hence faster to access.If the data is present in L1 then we declare a cache hit otherwise it is a cache miss. In case of cache miss,L2 cache is checked which typically takes 5-12 cycles to access. The main memory is much slower due to its large size.
+Instead of having a single flat memory system,processors use a hierarchical memory system to maximise performance.
+
+\Exercise How do we take advantage of spatial locality in the memory system?
+\Answer
+The address distance distribution suggests that if we group a set of memory locations into one block, and fetch it at one go from the lower level, then we can increase the number of cache hits because there is a high degree of spatial locality in accesses.
+
+
+\end{ExerciseList}
+
+\section*{Caches and the Memory System}
+
+\begin{ExerciseList}
+
+\Exercise
+\label{que:fullassoc}
+Consider a fully associative cache following  the LRU replacement scheme
+and consisting of only 8 words. Consider the
+following sequence of memory accesses (the numbers denote the word address): \\
+20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 22, 30, 21, 23, 31\\
+
+Assume that we begin when the cache is empty. What are the contents of
+the cache after the end of the sequence of memory accesses.
+
+
+\Answer
+28, 29, 22, 30, 21, 23, 31, 27 at locations 0 to 7 respectively.
+
+\Exercise
+Answer Exercise~\ref{que:fullassoc} assuming a FIFO replacement scheme.
+\Answer
+28, 29, 30, 21, 23, 31, 26, 27 at locations 0 to 7 respectively 
+\Exercise
+Consider a two-level cache using a write back policy. The L1 cache can store 2 words,
+and the L2 cache can store 4 words. Assume the
+caches to be fully associative and following  the 
+LRU replacement scheme.  Consider the following
+sequence of memory accesses. The format of a write access is {\em write $<$address$>$ $<$value$>$},
+and the format for a read access is {\em read $<$address$>$ }.
+
+\begin{Verbatim}[frame=single]
+write 20 200
+write 21 300
+write 22 400
+write 23 500
+write 20 201
+write 21 301
+read 22
+read 23
+write 22 401
+write 23 501
+\end{Verbatim}
+
+What are the contents of the caches at the end of the sequence of memory accesses?
+What are the contents of the caches, if we assume a write through policy ?
+
+\Answer With write back:\\
+{\em L1 cache:}\\
+\begin{tabular}{|c|c|}
+\hline
+{\bf Address} & {\bf Value}\\
+\hline \hline
+22 & 401 \\
+\hline
+23 & 501 \\
+\hline
+\end{tabular}\\
+
+{\em L2 cache:}\\
+\begin{tabular}{|c|c|}
+\hline
+{\bf Address} & {\bf Value}\\
+\hline \hline
+20 & 201 \\
+\hline
+21 & 301 \\
+\hline
+22 & 400 \\
+\hline
+23 & 500 \\
+\hline
+\end{tabular}\\
+
+With write through policy, contents of L1 cache remain the same. {\em L2 cache:}\\
+
+\begin{tabular}{|c|c|}
+\hline
+{\bf Address} & {\bf Value}\\
+\hline \hline
+20 & 201 \\
+\hline
+21 & 301 \\
+\hline
+22 & 401 \\
+\hline
+23 & 501 \\
+\hline
+\end{tabular}\\
+
+
+
+
+\Exercise
+What is the total size (in bytes) of a direct mapped cache with the following configuration in a 32
+bit system?
+It has a 10 bit index, and a block size of 64 bytes. Each block has 1 valid bit and 1
+dirty bit. 
+
+\Answer 6 bits for offset, 10 bits for index $\Rightarrow$ 16 bits for tag. It is a direct mapped cache, which implies
+there are $2^{10}$ entries in all.\\Size of each entry (in bits) = [ 16(tag of virtual address) + 64(data) ]$\times 8$ +
+2 \\ Total size of cache = 82,176 bytes
+
+
+\Exercise
+Which sorting algorithm will have a better cache performance -- bubble sort or selection sort? Explain your
+answer.
+
+\Answer Bubble sort will, in general, give a better cache performance. This is because a lot of operations (comparisons
+and exchanges) are done among adjacent elements which once get loaded into cache, do not need to be evicted. Where as,
+selection sort requires exchanges at far off locations, while reading the array sequentially, and thus will require a
+lot of evictions and result in a higher cache miss rate.
+
+
+\Exercise
+You have a cache with the following parameters:
+\begin{itemize}
+\item size : $n$ bytes
+\item associativity : $k$
+\item block size : $b$ bytes
+\end{itemize}
+Assuming a 32 bit address space, answer the following:
+
+\begin{enumerate}[(a) ]
+\item What is the size of the tag in bits? 
+\item What is the size of the set index in bits? 
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}[(a) ]
+\item $32-\log n +\log k$
+\item $\log n -\log b -\log k $
+\end{enumerate}
+
+
+\Exercise[difficulty=1]
+Consider a direct mapped cache with 16 cache lines, indexed 0 to 15,
+where each cache line can contain 32 integers (block size : 128 bytes). 
+
+Consider a two-dimensional, $32 \times 32$ array of integers $a$. This array is laid
+out in memory so that $a[0,0]$ is next to $a[0,1]$, and so on. Assume the cache is 
+initially empty, but that $a[0,0]$ maps to the first word of cache line 0. 
+
+Consider the following {\em column-first} traversal: 
+
+\begin{Verbatim}[frame=single]
+int sum = 0;
+for (int i = 0; i < 32; i++) {
+    for( int j=0; j < 32; j++) {
+          sum += a[i,j]; 
+    }
+}
+\end{Verbatim}
+
+and the following {\em row-first} traversal: 
+
+\begin{Verbatim}[frame=single]
+int sum = 0;
+for (int i = 0; i < 32; i++) {
+    for( int j=0; j < 32; j++) {
+         sum += a[j,i]; 
+    }
+}
+\end{Verbatim}
+
+Compare the number of cache misses produced by the two traversals, assuming the
+oldest cache line is evicted first. Assume that $i$, $j$, and $sum$ are stored
+in registers. Assume that no part of array, $a$, is saved in registers. It is
+always stored in the cache.
+
+\Answer:\\
+Number of cache misses in {\em column first} traversal = 32. Miss rate = 3.1\%. \\
+Number of cache misses in {\em row first} traversal = $32 \times 32 = 1024$. Miss rate = 100\%.\\ 
+
+\Exercise
+A processor has a baseline IPC of 1.5, an L1 miss rate of 5\%, and an L2 miss rate of 50\%. The hit time
+of the L1 cache is 1 cycle (part of the baseline IPC computation), the L2 hit time is 10 cycles, and the L2 miss
+penalty is 100 cycles. Compute the final IPC. Assume that all the miss rates are local miss rates.
+\Answer
+
+
+\Exercise Consider the designs shown below 
+
+\begin{tabular}{||l|l|p{15mm}|p{15mm}|p{14mm}|p{15mm}|p{15mm}||}
+\hline
+\hline
+Design & Base CPI & L1 local miss rate (\%) & L2 local miss rate (\%) & L1 hit time (cycles) & 
+		L2 hit time (cycles) & L2 miss penalty (cycles)\\
+\hline
+$\mathcal{D}_1$ & 1 & 5 & 20 & 1 & 10 & 200 \\
+\hline
+$\mathcal{D}_2$ & 1.5 & 10 & 25 & 1 & 20 & 150 \\
+\hline
+$\mathcal{D}_3$ & 2 & 15 & 20 & 1 & 5 & 300 \\
+\hline
+\hline
+\end{tabular} \\
+
+
+The base CPI assumes that all the instructions hit in the L1 cache.
+Furthermore, assume that a third of the instructions are memory instructions. 
+
+Write the formula for the average memory access time.
+What is the CPI of $\mathcal{D}_1$, $\mathcal{D}_2$ and $\mathcal{D}_3$?
+
+
+\Answer
+$T_{av} = L1_{Hit\_Time} + L1_{miss\_rate} \times \left ( L2_{Hit\_Time} + L2_{miss\_rate}\times L2_{miss\_penalty} \right )$
+\begin{tabular}{c}
+CPI of $\mathcal{D}_1=1.83$  \\
+CPI of $\mathcal{D}_2=3.42$ \\
+CPI of $\mathcal{D}_3=5.25$  \\
+\end{tabular}
+
+
+\Exercise [difficulty=1]
+Assume a cache that has $n$ levels. For each level, the hit time is $x$ cycles, and the local miss rate is $y$ per cycle.
+\begin{enumerate}[(a) ]
+\item
+What is the recursive formula for the average memory access time? 
+\item What is the average memory access time as $n$ tends to $\infty$?
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}[(a) ]
+\item 
+$T(n) = x +y\times T(n-1)$
+\item 
+$T(n) = \frac{x}{1-y}$
+\end{enumerate}
+
+
+
+
+\Exercise [difficulty=2]
+Assume that you are given a machine with an unknown configuration.
+You need to find out a host
+of cache parameters by measuring the time it takes to execute different programs.
+These programs will be tailor made in such a way that they will reveal something
+about the underlying system. 
+For answering the set of questions, you need to broadly describe
+the approach. Assume the cache follows LRU scheme for replacement.
+\begin{enumerate}[(a) ]
+	\item How will you estimate the size of the L1 cache?
+	\item How will you estimate the L1 block size?
+	\item How will you estimate the L1 cache associativity?
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}[(a) ]
+\item
+Store data byte wise in a relatively large continuous chunk of memory (say $n$ bytes). Then start reading the data in
+opposite order in which it was written and keep noting the time taken. There will be a byte $k$ for which the time to
+read is substantially higher than the others previously read. The size of L1 cache is $n-k$ bytes. If no such byte $k$
+is detected, increase $n$ and repeat the whole process.  \item
+Do the process as in part (a). While reading, suppose byte $k1$ was the first byte for which the read time was
+substantially higher than others. Continue the process of backward reading until another byte $k2$ is obtained with read
+time similar to that of byte $k1$ (higher than others). Size of L1 block size is $|k1-k2|$.  \item
+First of all, we check if it is direct mapped cache. To do this, we choose a memory location (call it $x$) and write on
+it. Then we start reading each memory location and location $x$ at alternate steps. That is, a location $n$ is read,
+followed by location $x$, followed by location $n+1$, again followed by $x$ and so on. The time to read location $x$ is
+recorded. If at any instant, this time shows a peak (has a substantially higher value than other previous values upon
+reading at same location $x$), it implies that the cache is direct mapped.\\ We then check for higher values of
+associativity. For checking the cache for an associativity value of $k$, the cache
+should be first checked for all possible values of lower associativity and the checks should have failed. As done
+before, we first write on a location $x$. We then make all possible combinations of $k$ memory locations, and proceed by
+reading each combination and location $x$ alternately. Time for reading location $x$ is noted and a peak in it denotes
+that the cache is $k$-associative.\\ If the size of the cache is $c$ blocks and cache does not have an associativity
+value of less than $c$, it implies that the cache is fully associative.\\
+NOTE: This algorithm is exponential in time.
+\end{enumerate}
+
+\end{ExerciseList}
+
+
+\section*{Virtual Memory}
+
+\begin{ExerciseList}
+
+
+\Exercise
+In a 32 bit machine with a 4 KB page size, how many entries are there in a single level page table? 
+What is the size of each entry in the page table in bits?
+
+\Answer
+Number of entries = $2^{20}$\\
+Size of each entry = $20$ bits
+
+\Exercise
+Consider a 32 bit machine with a 4 KB page size, and a two level page table. If we address the
+primary page table with 12 bits of the page address,
+then how many entries are there in each secondary page table?
+\Answer
+Number of entries in each secondary page table = $2^{8}$\\
+\Exercise
+In a two level page table, should we index the primary page table with the most significant bits
+of the page address, or the least significant bits? Explain your answer.
+\Answer
+Yes. The commonly used regions are the text segment, heap, and stack segment. The former two are
+in the lower parts of the address space, and the stack is typically at the highest end of the address
+space. There is a massive void in between. This void is captured by the highest order (MSB)
+bits. Furthermore, this scheme will help us minimise the number of secondary page tables. To the
+contrary, if we use low order bits, then most likely all the entries in the primary page table will
+need to point to a secondary page table, and we will not be able to save space while storing page
+tables.
+
+
+
+\Exercise
+We have a producer-consumer interaction between processes $A$ and $B$. $A$ writes data
+that $B$ reads in a shared space. However, B should never be allowed to write anything into
+that shared space. How can we implement this using paging? How do we ensure that B will
+never be able to write into the shared space?
+
+\Answer
+It can be achieved by using a page table which is shared by both A and B. Each entry in page table will have 2
+additional bits indicating if the corresponding process has write permission or not. The bit corresponding to A will be
+1 and that corresponding to B will be 0. If B attempts a write at a shared memory location, the page table, after seeing
+the write permission bit, should not forward its request to the physical memory.
+
+
+\Exercise
+Assume a process $A$, forks a process $B$. Forking 
+a process means that $B$ inherits a copy
+of $A$'s entire address space. 
+However, after the fork call, the address spaces are separate.
+How can we implement this using our paging mechanism?
+\Answer
+The virtual addresses for the child process remain the same, but the physical addresses are separate. On forking, a new
+page table is created for the child process with mappings to ``fresh" locations in the physical memory. Also, the data
+stored in the memory locations used by the parent process is copied to these new locations.
+
+\Exercise
+How is creating a new thread different from a fork() operation in terms of memory
+addressing?
+\Answer
+fork() operation creates a new address space with new mappings and the forked processes do not share data. Where as,
+pthread() operation creates {\em threads} which share the virtual space (page tables) as well as the same physical
+address space in memory and they are able to share data with each other. That is why pthread() operation takes lesser
+time than fork() operation to execute.
+
+\Exercise
+Most of the time, the new process generated by a $fork$ call does not attempt to change or modify the data inherited
+from the parent process. So is it really necessary to copy all the frames of the parent process to  
+the child process? Can we optimise this process?
+
+\Answer
+Whenever forking is done, the child process can share the frames in the physical memory with the parent process. If the
+child process attempts to write on any of the shared location, that frame can be copied to a new location and the
+mapping corresponding to it can be changed in the child's page table. This is a widely used optimisation technique
+called copy-on-write (COW).
+
+
+\Exercise
+Explain the design of an inverted page table.
+
+\Answer
+Create a hash function function that would take virtual address and process ID information and map it to an index in a
+hash table (called {\em Hash Anchor Table}). This Hash Anchor Table will have physical frame numbers. Go to the
+corresponding frame number in the physical memory where the virtual page number and the process ID are stored. If the
+virtual page number and the process ID match with the one being queried, then we get the frame address corresponding to
+the page address. In case of mismatch (due to collision), the hash anchor table would either have chaining leading to
+another frame address or a null pointer at the end of chain indicating a page fault.
+
+
+
+\Exercise[difficulty=1]
+Calculate the expected value of the final CPI:
+
+\begin{itemize}
+\item Baseline CPI : 1
+\item TLB lookup time: 1 cycle (part of the baseline CPI)
+\item TLB miss rate: 20\%
+\item Page table + TLB lookup time: 20 cycles (do not assume any page faults)
+\item L1 cache hit time: 1 cycle (Part of the baseline CPI)
+\item L1 local miss rate: 10\%
+\item L2 cache hit time: 20 cycles
+\item L2 local miss rate: 50\%
+\item L2 miss penalty: 100 cycles
+\end{itemize}
+
+
+\Exercise[difficulty=2]
+Most of the time, programmers use libraries of functions in their programs. These libraries contain functions
+for standard mathematical operations, for supporting I/O operations, and for interacting with the operating system.
+The machine instructions of these functions are a part of the final executable. Occasionally, programmers
+prefer to use
+dynamically linked libraries (DLLs). DLLs contain the machine code of specific functions. However, they are
+invoked at run time, and their machine code is not a part of the program executable. Propose a method
+to implement a method to load and unload DLLs with the help of virtual memory.
+\Answer
+The code section of a DLL is shared by all the processes using that DLL and the DLL occupies a single place in memory.
+However, each process using the DLL has its own copy of the data of DLL. When a DLL is loaded by a process, the data
+section is copied into a new location and a mapping is created for that data in the virtual memory of the process. Thus,
+a modification in data section of DLL by any process is not reflected in any other process using the same DLL.
+
+\end{ExerciseList}
+
+\section*{Design Problems}
+
+\begin{ExerciseList}
+\Exercise
+You need to learn to use the CACTI tool (\url{http://www.hpl.hp.com/research/cacti/}) to estimate the area, latency, and power
+of different cache designs. Assume a 4-way associative 512 KB cache with 64 byte blocks.
+The baseline design has 1 read port, and 1 write port. You need to assume the baseline design,
+vary one parameter as mentioned below, and plot its relationship with the area, latency, or power consumption
+of a cache.
+
+\begin{enumerate}[a)]
+\item Plot the area versus the number of ports.
+\item Plot the energy per read access versus the number of read ports.
+\item Plot the associativity versus the latency.
+\item Vary the size of the cache from 256 KB to 4 MB (powers of 2), and plot its relationship with
+area, latency, and power. 
+\end{enumerate}
+
+\Exercise
+Write a cache simulator that accepts memory read/write requests and simulates the execution of a hierarchical
+system of caches.
+
+\end{ExerciseList}

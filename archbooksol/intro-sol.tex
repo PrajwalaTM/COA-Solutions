@@ -1,0 +1,194 @@
+\vskip 1cm
+ \begin{flushright}
+Solutions by Saumya Sahay $<$saumyasahay98@gmail.com$>$
+\end{flushright}
+ 
+\section*{Exercises}
+\vskip 1cm
+                                                                                     
+
+\section*{Processor and Instruction Set}
+
+\begin{ExerciseList}
+\Exercise
+Find out the model and make of at least 5 processors in devices around you. The devices can
+include desktops, laptops, cell phones, and tablet PCs. 
+
+\Exercise
+Make a list of peripheral I/O devices for computers. Keyboards are mice are common devices.
+Search for uncommon devices. (HINT: joysticks, game controllers, fax machines)
+
+\Exercise
+What are the four properties of an instruction set?
+
+\Exercise
+Design an instruction set for a simple processor that needs to perform the following
+operations: 
+\begin{enumerate}
+\item Add two registers
+\item Subtract two registers
+\end{enumerate}
+
+\Exercise
+Design an instruction set for a simple processor that needs to perform the following
+operations: 
+
+\begin{enumerate}
+\item Add two registers
+\item Save a register to memory
+\item Load a register from memory
+\item Divide a value in a register by two
+\end{enumerate}
+
+\Exercise
+Design an instruction set
+to perform the basic arithmetic operations -- add, subtract, multiply, and divide. 
+Assume that all the instructions can have just one operand.
+
+\Exercise[difficulty=1]
+Consider the $sbn$ instruction that subtracts the second operand from the first operand,
+and branches to the instruction specified by the label (third operand), if the result is negative.
+Write a small program using only the $sbn$ instruction to compute the factorial of a positive
+number. 
+\Answer:
+We assume that the variable one is initialised to 1, index to the number whose factorial is to be found and fact to 1.
+fact stores the factorial of the number in index at the end of the execution of the program.
+
+\begin{Verbatim}[frame=single]
+1:  sbn temp1,temp1
+2:  sbn temp1,index
+3:  sbn a,temp1
+4:  sbn temp,temp
+5:  sbn c,c
+6:  sbn temp,fact
+7:  sbn a,one,11
+8:  sbn c,temp
+9:  sbn temp2,temp2
+10: sbn temp2,one,7 
+11: sbn temp2,temp2
+12: sbn temp2,c
+13: sbn fact,fact
+14: sbn fact,c
+15: sbn index,one
+16: sbn temp, temp
+17: sbn temp,index,1
+18:<exit>
+\end{Verbatim}
+\Exercise[difficulty=1]
+Write a small program using only the $sbn$ instruction to test if a number is prime. 
+
+\Answer:
+We assume that the variable one is initialised to 1, index to the number whose factorial is to be found and b to 1.
+The program jumps to label prime if the number is prime and to notprime if the number is not prime.
+
+\begin{Verbatim}[frame=single]
+1: sbn a,a
+2: sbn temp,temp
+3: sbn temp,num
+4: sbn a,num,
+5: sbn temp1,temp
+6: sbn temp1,one
+7: sbn b,temp1
+8: sbn temp2,temp2
+9: sbn temp2,temp
+10: sbn temp2,b
+11: sbn temp2,one,prime
+12: sbn c,c
+13: sbn temp4,temp4
+14: sbn quo,quo
+15: sbn c,one
+16: sbn a,b,1
+17: sbn quo,c
+18: sbn temp4,1,16
+19: sbn a,one,not_prime
+\end{Verbatim}
+
+\end{ExerciseList}
+
+\section*{Theoretical Aspects of an ISA*}
+\begin{ExerciseList}
+
+\Exercise
+Explain the design of a modified Turing machine.
+
+\Exercise
+Prove that the $sbn$ instruction is Turing complete.
+
+\Exercise
+Prove that a machine with memory load, store, branch, and subtract instructions is Turing complete.
+
+\Exercise[difficulty=2]
+Find out other models of universal machines from the internet and compare them with
+Turing Machines. 
+\end{ExerciseList}
+
+\section*{Practical Machine Models}
+
+\begin{ExerciseList}
+\Exercise What is the difference between the Harvard architecture and Von Neumann
+architecture?
+
+\Exercise What is a register machine? 
+
+\Exercise What is a stack machine? 
+
+
+\Exercise
+Write a program to compute $\mathbf{a + b + c - d}$ on a stack machine. 
+\Answer:
+\begin{Verbatim}[frame=single]
+push d 
+push c 
+subtract //c-d
+push a 
+push b 
+add    //a+b
+add    //a+b+c-d 
+pop w
+\end{Verbatim}
+\Exercise
+Write a program to compute $\mathbf{a + b + (c - d)*3}$  on a stack machine. 
+\Answer:
+\begin{Verbatim}[frame=single]
+push d 
+push c 
+subtract //c-d
+push 3
+multiply //(c-d)*3
+push a 
+push b 
+add    //a+b
+add    //a+b+(c-d)*3
+pop w
+\end{Verbatim}
+\Exercise
+Write a program to compute $\mathbf{(a + b/c) *(c - d)+e}$
+on a stack machine. 
+\Answer:
+\begin{Verbatim}[frame=single]
+push c
+push b
+divide // b/c
+push a
+add    //(a+(b/c))
+push d
+push c
+subtract
+multiply   //(a+(b/c))*(c-d)
+push e
+add    //(a+(b/c))*(c-d)+e
+pop w
+
+\end{Verbatim}
+\Exercise[difficulty=2]
+Try to search the internet, and find answers to the following questions.  
+\begin{enumerate}
+\item When is having a separate instruction memory more beneficial?
+\item When is having a combined instruction and data memory more beneficial?
+\end{enumerate}
+
+
+\end{ExerciseList}
+
+
+

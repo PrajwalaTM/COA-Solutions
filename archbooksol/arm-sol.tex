@@ -1,0 +1,792 @@
+
+\vskip 1cm
+\section*{Exercises}
+\vskip 1cm
+
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+
+\section*{Basic ARM Instructions}
+
+\begin{ExerciseList}
+
+\Exercise
+Translate the following code in C to the
+ARM instruction set using a minimum number of instructions.
+Assume the variables $a$, $b$, $c$, $d$ and $e$ are
+32-bit integers and stored in $r0$, $r1$, $r2$, $r3$ and $r4$ respectively. 
+
+\begin{enumerate}
+	\item[(a) ] 
+\begin{Verbatim}
+a=a+b+c+d+e;
+\end{Verbatim}
+\item[(b) ] 
+\begin{Verbatim}
+a=b+c;
+d=a+b;
+\end{Verbatim}
+	\item[(c) ]
+\begin{Verbatim}
+a=b+c+d;
+a=a+a;
+\end{Verbatim}
+	\item[(d) ] 
+	\begin{Verbatim}
+a=2*a+b+c+d;
+\end{Verbatim}
+	\item[(e) ] 
+\begin{Verbatim}
+a=b+c+d; 
+a=3*a;
+\end{Verbatim}
+
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}
+	\item[(a) ]
+\begin{Verbatim}[frame=single]
+add r0, r0, r1
+add r0, r0, r2
+add r0, r0, r3
+add r0, r0, r4
+\end{Verbatim}
+	\item[(b) ]
+\begin{Verbatim}[frame=single]
+add r0, r1, r2
+add r3, r0, r1
+\end{Verbatim}
+	\item[(c) ]
+\begin{Verbatim}[frame=single]
+add r0, r1, r2
+add r0, r0, r3
+add r0, r0, r0
+\end{Verbatim}
+	\item[(d) ]
+\begin{Verbatim}[frame=single]
+add r0, r1, r0, lsl #1
+add r0, r0, r2
+add r0, r0, r3
+\end{Verbatim}
+	\item[(e) ]
+\begin{Verbatim}[frame=single]
+add r0, r1, r2
+add r0, r0, r3
+add r0, r0, r0, lsl #1
+\end{Verbatim}
+\end{enumerate} 
+
+
+\Exercise
+Translate the following pieces of code from the 
+ARM assembly language to a high level language.
+Assume that the variables $a$, $b$, $c$, $d$ and $e$ (containing integers)
+are stored in the registers $r0$, $r1$, $r2$, $r3$ and $r4$ respectively.
+
+\begin{enumerate}
+\item[(a) ] 
+\begin{Verbatim}[frame=single]
+add r0, r0, r1
+add r0, r0, r2
+add r0, r0, r3
+\end{Verbatim}
+\item[(b) ]
+\begin{Verbatim}[frame=single]
+orr r0, r0, r1, lsl #1
+and r1, r0, r1, lsr #1
+\end{Verbatim}
+\item[(c) ]
+\begin{Verbatim}[frame=single]
+add r0, r1, r2
+rsb r1, r0, r2
+\end{Verbatim}
+\item[(d) ]
+\begin{Verbatim}[frame=single]
+add r0, r1, r2
+add r0, r3, r4
+add r0, r0, r1
+\end{Verbatim}
+\item[(e) ]
+\begin{Verbatim}[frame=single]
+mov r0 #1, lsl #3
+mov r0, r0, lsr #1
+\end{Verbatim}
+\end{enumerate}
+
+
+\Answer:
+\begin{enumerate}
+\item[(a) ]
+$a=a+b+c+d$;
+\item[(b) ]
+$a=a\:|\:(b*2)$;\\
+$b=a\:\&\:(b/2)$;
+\item[(c) ]
+$a=b+c$; \\
+$b=c-a$;
+\item[(d) ]
+$a=d+e+b$;
+\item[(e) ]
+$a=4$;
+\end{enumerate}
+
+
+
+\Exercise Answer the following:
+\begin{enumerate}
+\item[(a) ] Write the smallest possible ARM assembly program to load the constant 0xEFFFFFF2 into register
+r0.
+\item[(*b) ] Write the smallest possible ARM assembly program to load the constant 0xFFFD67FF into register
+r0.
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}
+\item[(a) ]
+\begin{Verbatim}[frame=single]
+mvn r0, #0xD
+\end{Verbatim}
+\item[(b) ]
+\begin{Verbatim}[frame=single]
+mvn r0, #0x29800
+\end{Verbatim}
+\end{enumerate}
+
+\Exercise[difficulty=1]
+Using valid ARM assembly instructions, load the constant, 
+0xFE0D9FFF, into register r0. Try do to it in the minimum number of instructions. DO NOT use pseudo-instructions or assembler directives.
+
+\Answer 0xFE0D9FFF = $(1111\: 1110\: 0000\: 1101\: 1001\: 1111\: 1111\: 1111)_2$
+\begin{Verbatim}[frame=single]
+mvn r0, 0x26000
+sub r0, r0, 0x1F00000
+\end{Verbatim}
+
+
+\Exercise
+Can you give a generic set of ARM instructions or a methodology using which you can load any 32 bit immediate value into a register?
+Try to minimise the number of instructions. %Also show that the bound on the number of instructions is tight.
+
+\Answer
+Arm architecture allows 12 bits for specifying an immediate with 8 bits of payload and 4 bits to specify rotation. So a 32-bit number can be broken down into 4 sets of 8-bit numbers and then loaded using add instructions.
+\\
+Example: \\Suppose we want to load the immediate 0xAAAAAAAA into R0. Following are the steps:
+\begin{Verbatim}[frame=single]
+mov r0, #0xAA
+add r0, r0, #0xAA00
+add r0, r0, #0xAA0000
+add r0, r0, #0xAA000000
+\end{Verbatim}
+
+
+
+\Exercise
+Convert the following C program to ARM assembly. 
+Store the integer, $i$, in register $r0$. Assume that the
+starting address of array $a$ is saved in register $r1$, and the starting address of array $b$ is saved in register
+$r2$.
+
+\begin{Verbatim}[frame=single]
+int i;
+int b[500];
+int a[500];
+for(i=0; i < 500; i++) {
+    b[i] = a[a[i]];
+}
+\end{Verbatim}
+
+\Answer:
+\begin{Verbatim}[frame=single]
+l1:
+	ldr r3, [r1, #0]
+	add r1, r1, #4
+	ldr r4, [r3, #0]
+	str r4, [r2, #0]
+	add r2, r2, #4
+	add r0, r0, #1
+	cmp r0, #500
+	bne l1
+	mov pc, lr
+main:
+	mov r0, #0
+	bl l1
+\end{Verbatim}
+
+\Exercise[difficulty=2]
+Consider the instruction, {\em mov lr, pc}. Why does this instruction add 8 to the PC, and use that value to set
+the value of $lr$? When is this behaviour helpful?
+\end{ExerciseList}
+
+\section*{Assembly Language Programming}
+
+\begin{itemize}
+\item For all the questions below, assume that two specialised functions, $\_\_div$ and $\_\_mod$, are available.
+The $\_\_div$ function divides the contents of $r1$ by the contents of $r2$, and saves the result in $r0$.
+Similarly, the $\_\_mod$ function is used to divide $r1$ by $r2$, and save
+the remainder in $r0$. Note that in this case both the functions
+perform integer division.
+\end{itemize}
+
+\vskip 2cm
+
+\begin{ExerciseList}
+
+\Exercise
+Write an ARM assembly language program to compute the
+2's complement of a number stored in $r0$.
+\Answer
+Code:
+\begin{Verbatim}[frame=single]
+rsb r1, r0, #0
+\end{Verbatim}
+
+
+
+\Exercise
+Write an ARM assembly language program that subtracts two 
+64-bit integers stored in four registers.
+
+Assumptions:
+\begin{itemize}
+\item Assume that you are subtracting $A - B$
+\item $A$ is stored in register, $r4$ and $r5$. The MSB is in $r4$, and the LSB is in $r5$.
+\item $B$ is stored in register, $r6$ and $r7$. The MSB is in $r6$, and the LSB is in $r7$.
+\item Place the final result in $r8$(MSB), and $r9$(LSB). 
+\end{itemize}
+
+\Answer :
+\begin{Verbatim}[frame=single]
+sub r9, r5, r7
+cmp r5, r7
+sub r8, r4, r6
+sublo r8, r8, #1
+\end{Verbatim}
+An alternate smaller code:
+\begin{Verbatim}[frame=single]
+subs r9, r5, r7
+sbc r8, r4, r6
+\end{Verbatim}
+
+
+\Exercise
+Write an assembly program to add two 96-bit numbers $A$
+ and $B$ using the minimum number of instructions.
+$A$ is stored in three registers $r2$, $r3$ and $r4$ 
+with the MSB in $r2$ and LSB in $r4$.
+$B$ is stored in registers $r5$, $r6$ and $r7$ with the
+ MSB in $r5$ and LSB in $r7$. Place the final result in $r8$(MSB), $r9$ and $r10$(LSB).
+
+\Answer :
+\begin{Verbatim}[frame=single]
+adds r10, r4, r7
+adcs r9, r3, r6
+adc r8, r2, r5
+\end{Verbatim}
+
+\Exercise
+Write an ARM assembly instruction code to count the number of 1's in a 32 bit number.
+
+\Answer :
+\begin{Verbatim}[frame=single]
+l0:
+	and r1, r0, r3
+	mov r0, r0, lsl #1
+	cmp r1, #0
+	addne r4, r4, #1
+	cmp r0, #0
+	bne l0
+	mov pc, lr
+count:
+	mov r4, #0
+	mov r0, #1
+	bl l0
+\end{Verbatim}
+
+
+\Exercise
+Given a 32-bit integer in $r3$,
+write an ARM assembly program to count the number of 1 to 0 transitions in it. 
+
+\Answer Code:
+\begin{Verbatim}[frame=single]
+l1:
+	and r1, r3, r0
+	mov r0, r0, lsl #1
+	and r2, r3, r0
+	sub r2, r2, r1, lsl #1
+	cmp r2, r0
+	addeq r4, r4, #1
+	cmp r0, #0x80000000
+	bne l1
+	mov pc, lr
+transition:
+	mov r4, #0
+	mov r0, #1
+	bl l1
+\end{Verbatim}
+
+
+\Exercise[difficulty=1]
+Write an ARM assembly program that checks if a 32-bit number is a palindrome.
+Assume that the input is available in $r3$. The program should set $r4$
+ to 1 if it is a palindrome, otherwise $r4$ should have 0.
+A palindrome is a number which is the same when read from both
+ sides. For example, 1001 is a 4 bit palindrome.
+
+\Answer Code:
+\begin{Verbatim}[frame=single]
+l1:
+	and r1, r3, r0
+	mov r0, r0, lsl #1
+	cmp r1, #0
+	mov r1, r1, lsl #1
+	mov r2, r2, lsl #1
+	addne r2, r2, #1
+	cmp r0, #0
+	bne l1
+	mov pc, lr
+palin:
+	mov r4, #0
+	mov r0, #1
+	mov r2, #0
+	bl l1	
+	cmp r3, r2
+	moveq r4, #1
+\end{Verbatim}
+
+
+\Exercise
+Design an ARM Assembly Language program that will examine a 32-bit 
+value stored in $r1$ and count the number of contiguous sequences of 1s. For example, the value:
+\begin{displaymath}
+0111 0001 0001 1110 1100 0111 0001 1111 
+\end{displaymath}
+contains six sequences of 1s. Write the final value in register r2. Use conditional instructions
+as much as possible.
+
+\Answer Following is the program
+\begin{Verbatim}[frame=single]
+l0:
+	cmp r4, #0
+	moveq r4, #1
+	addeq r2, r2, #1
+	mov pc, lr
+l1:
+	and r3, r1, r0
+	cmp r3, #0
+	stmfd sp!, {lr}
+	blne l0
+	ldmfd sp!, {lr}
+	cmp r3, #0
+	moveq r4, #0
+	mov r0, r0, lsl #1
+	cmp r0, #0
+	bne l1
+	mov pc, lr
+count:
+	mov r2, #0
+	mov r0, #1
+	mov r4, #0
+	bl l1
+\end{Verbatim}
+
+
+\Exercise[difficulty=2]
+In some cases, we can rotate an integer to the right by $n$  positions (less than or equal to 31) so that we obtain the same number.
+For example: a 8-bit number 11011011 can be right rotated by 3 or 6
+places to obtain the same number.
+Write an ARM assembly program
+to {\em efficiently} count the number of ways we can rotate a number to the right such that the result is 
+equal to the original number. 
+\Answer:
+\begin{Verbatim}[frame=single]
+l0:
+	mov r1, #32
+	div r4, r1, r0
+	mod r2, r1, r0
+	cmp r2, #0
+	subeq r4, r4, #1
+	mov pc, lr
+l1:
+	cmp r1, r3
+	mov r1, r1, ror #1
+	add r0, r0, #1
+	bne l1
+	stmfd sp!, {lr}
+	bl l0
+	ldmfd sp!, {lr}
+	mov pc, lr
+count:
+	mov r4, #0
+	mov r0, #1
+	mov r1, r3, ror #1
+	bl l1
+\end{Verbatim}
+
+\Exercise
+Write an ARM assembly program to load and store an integer from memory, where the memory saves it in the
+big endian format.
+
+\Answer
+Load instruction:
+\begin{Verbatim}[frame=single]
+ldrb r2, [r0, #0]
+mov r1, r2
+ldrb r2, [r0, #-1]
+add r1, r1, r2, lsl #8
+ldrb r2, [r0, #-2]
+add r1, r1, r2, lsl #16
+ldrb r2, [r0, #-3]
+add r1, r1, r2, lsl #24
+\end{Verbatim}
+
+Store instruction:
+\begin{Verbatim}[frame=single]
+and r2, r1, #0xFF
+strb r2, [r0, #0]
+and r2, r1, #0xFF00
+mov r2, r2, lsr #8
+strb r2, [r0, #-1]
+and r2, r1, #0xFF0000
+mov r2, r2, lsr #16
+strb r2, [r0, #-2]
+and r2, r1, #0xFF000000
+mov r2, r2, lsr #24
+strb r2, [r0, #-3]
+\end{Verbatim}
+
+
+
+
+
+
+\Exercise
+Write an ARM assembly program to find out if a number is prime using a recursive algorithm.
+
+\Answer:
+\begin{Verbatim}[frame=single]
+l1:
+	mod r5, r3, r4
+	cmp r5, #0
+	addeq r2, r2, #1
+	add r4, r4, #1
+	cmp r4, r6
+	ble l1
+	mov pc, lr
+prime:
+	mov r7, #0
+	mov r3, r0
+	mov r6, r0, lsr #1
+	mov r4, #1
+	mov r2, #0
+	bl l1
+	cmp r2, #1
+	moveq r7, #1
+\end{Verbatim}
+
+
+
+
+\Exercise[difficulty=1]
+Suppose you decide to take your ARM device to some place with a high amount of radiation,
+which can cause some bits to flip, and consequently corrupt data. 
+Hence, you decide to store a single bit checksum, which stores the parity of all the other bits, 
+at the LSB position of the number (Essentially you can now store only 31 bits of data in a register).
+Write an ARM assembly program, which adds the two numbers taking care of the checksum. 
+Assume that no bits flip while the program is running. 
+
+\Answer Code
+\begin{Verbatim}[frame=single]
+l1:
+	and r2, r5, r0
+	cmp r2, #0
+	eorne r1, r1, #1
+	mov r0, r0, lsl #1
+	cmp r0, #0
+	bne l1
+	add r5, r5, r1
+	mov pc, lr
+add:
+	mov r0, #2
+	mov r1, #0
+	mvn r2, #1
+	and r3, r3, r2
+	and r4, r4, r2
+	add r5, r3, r4
+	bl l1
+\end{Verbatim}
+
+
+
+
+
+\Exercise[difficulty=1]
+Let us encode a 32 bit number by using 2 bits to represent 1 bit. We shall represent logical 0 by 
+01, and logical 1 by 10. 
+Now let us assume that a 16 bit number 
+is encoded and stored in a 32 bit register $r3$. 
+Write a program in ARM assembly to convert it back into a 16 bit number, and save the result in $r4$. 
+Note that 00 and 11 are invalid inputs and
+indicate an error. The program should set $r5$ to 1 in case of an error; otherwise, $r5$ should be 0.
+
+\Answer Program:
+\begin{Verbatim}[frame=single]
+l1:
+	and r1, r3, r0
+	mov r4, r4, lsl #1
+	cmp r1, r9
+	movlo r5, #1
+	addeq r4, r4, #1
+	cmp r1, r8
+	movhi r5, #1
+	mov r0, r0, lsr #2
+	mov r8, r8, lsr #2
+	mov r9, r9, lsr #2
+	cmp r0, #0
+	bne l1
+	mov pc, lr
+decode:
+	mov r5, #0
+	mov r4, #0
+	mov r0, #0xC0000000
+	mov r8, #0x80000000
+	mov r9, #0x40000000
+	bl l1
+\end{Verbatim}
+
+
+
+\Exercise[difficulty=2]
+Write an ARM assembly program to convert a 32-bit number to its 12 bit immediate form, 
+if possible, with first 4 bits for rotation and next 8 bits for the payload. 
+If the conversion is possible, set $r4$ to 1 and store the result in $r5$, 
+otherwise, $r4$ should be set to 0. Assume that the input number is available in register $r3$.
+
+\Answer The code:
+\begin{Verbatim}[frame=single]
+l0:
+	and r2, r3, r1
+	mov r8, #0
+	cmp r2, #0
+	movne r8, #1
+	cmp r6, #16
+	andlt r8, r8, #1
+	moveq r4, #0
+	moveq pc, lr
+	add r6, r6, #1
+	cmp r8, #1
+	moveq r3, r3, ror #2
+	beq l0	
+	cmp r2, #0
+	movne r4, #0
+	addeq r5, r3, r6, lsl #8
+	mov pc, lr
+immediate:
+	mov r4, #1
+	mvn r1, #0xFF
+	mvn r6, #0
+	mov r7, #0
+	bl l0
+\end{Verbatim}
+
+
+
+
+
+\Exercise[difficulty=2]
+Suppose you are given a 32-bit binary number. You are told that the number has exactly one bit equal to 1;
+the rest of the bits are 0. Provide a fast algorithm to find the location of that bit. 
+Implement the algorithm in ARM assembly. Assume the input to be available in $r9$. 
+Store the result in $r10$.
+
+\Answer
+We will use a technique similar to binary search. To check if bit 1 is present to left or right of the middle pivot position, we will start with a filter, which is a sequence of continuous 1's starting from MSB up to the pivot. If bit 1 is left of pivot, new pivot is calculated (as in binary search) and filter is modified using LSL instruction. If bit 1 is right of pivot, new pivot is again calculated and the filter is modified using ASR instruction. Following is the code to implement it.
+\begin{Verbatim}[frame=single]
+@left = r0
+@right = r1
+@middle = r2
+@filter = r3
+l0: 
+	@1 to left of middle
+	add r1, r2, #1
+	add r5, r0, r1
+	mov r5, r5, lsr #1
+	sub r7, r5, r2
+	mov r3, r3, lsl r7
+	mov r4, r4, lsl r7
+	mov r2, r5
+	mov pc, lr
+l1:
+	@1 to right of middle
+	sub r0, r2, #1
+	add r5, r0, r1
+	mov r5, r5, lsr #1
+	sub r7, r2, r5
+	mov r3, r3, asr r7
+	mov r4, r4, lsr r7
+	mov r2, r5
+	mov pc, lr
+control:
+	and r8, r9, r4
+	cmp r8, #0
+	movne r10, r2
+	movne pc, lr
+	and r8, r9, r3
+	cmp r8, #0
+	stmfd sp!, {lr}
+	blne l0
+	ldmfd sp!, {lr}
+	cmp r8, #0
+	stmfd sp!, {lr}
+	bleq l1
+	ldmfd sp!, {lr}
+	b control
+search:
+	mov r0, #31
+	mov r1, #0
+	mov r2, #15
+	mov r3, #0xff000000
+	add r3, r3, #0xff0000
+	mov r4, #0x10000
+	bl control
+\end{Verbatim}
+
+
+
+
+\Exercise[difficulty=3]
+Write an ARM assembly language program to find the greatest common divisor of two binary numbers $u$ and $v$.
+Assume the two inputs (positive integers) 
+to be available in $r3$ and $r4$. Store the result in $r5$.
+[HINT: The gcd of two even numbers $u$ and $v$ is $2*gcd(u/2,v/2)$]
+
+\Answer
+The algorithm, also known as Stein's algorithm is as follows:
+
+\begin{enumerate}
+	\item[1. ] $gcd (v, v) = v$
+	\item[2. ] $gcd(0, v) = v$, and $gcd(u, 0) = u$ 
+	\item[3. ] If $u$ and $v$ are both even, then $gcd(u, v) = 2\:.\:gcd(u/2, v/2)$
+	\item[4. ] If $u$ is even and $v$ is odd, then $gcd(u, v) = gcd(u/2, v)$, because $2$ is not a common divisor. Similarly for the other case, then $gcd(u, v) = gcd(u, v/2)$.
+	\item[5. ] If $u$ and $v$ are both odd:
+	\begin{enumerate}
+		\item[i) ] If $u \geq v$, then $gcd(u, v) = gcd((u - v)/2, v)$ 
+		\item[ii) ] If $u < v$, then $gcd(u, v) = gcd((v - u)/2, u)$
+	\end{enumerate}
+\end{enumerate}
+Following is the code in ARM assembly language:
+\begin{Verbatim}[frame=single]
+l0:
+	moveq r3, r3, lsr #1
+	moveq r4, r4, lsr #1
+	add r6, r6, #1
+	mov pc, lr
+l1:
+	cmp r2, #1
+	moveq r3, r3, lsr #1
+	movne r4, r4, lsr #1
+	mov pc, lr
+l2:
+	cmp r3, r4
+	subge r3, r3, r4
+	movge r3, r3, lsr #1
+	movlt r7, r3
+	sublt r3, r4, r3
+	movlt r3, r3, lsr #1
+	movlt r4, r7
+	mov pc, lr
+bcase:
+	mov r0, #0
+	cmp r3, r4
+	moveq r5, r3
+	addne r0, r0, #1
+	cmp r3, #0
+	moveq r5, r4
+	addne r0, r0, #1
+	cmp r4, #0
+	moveq r5, r3
+	addne r0, r0, #1
+	mov pc, lr
+case1:
+	and r1, r3, #1
+	and r2, r4, #1
+	add r1, r1, r2
+	cmp r1, #0
+	stmfd sp!, {lr}
+	bleq l0
+	ldmfd sp!, {lr}
+	cmp r1, #1
+	stmfd sp!, {lr}
+	bleq l1
+	ldmfd sp!, {lr}
+	cmp r1, #2
+	stmfd sp!, {lr}
+	bleq l2
+	ldmfd sp!, {lr}
+	mov pc, lr
+control:
+	stmfd sp!, {lr}
+	bl bcase
+	ldmfd sp!, {lr}
+	cmp r0, #3
+	moveq r3, r3, lsl r6
+	moveq pc, lr
+	stmfd sp!, {lr}
+	bl case1
+	ldmfd sp!, {lr}
+	b control
+gcd:
+	mov r6, #0
+	bl control
+\end{Verbatim}
+
+\end{ExerciseList}
+
+\subsection*{ARM Instruction Encoding}
+
+\begin{ExerciseList}
+\Exercise
+How are immediate values encoded in the ARM ISA?
+
+\Exercise
+Encode the following ARM instructions. Find the opcodes for 
+instructions from the ARM architecture manual~\cite{armbook}.
+
+\begin{enumerate}[i) ]
+\item add r3, r1, r2
+\item ldr r1, [r0, r2]
+\item str r0, [r1, r2, lsl \#2]
+\end{enumerate}
+
+
+\end{ExerciseList}
+
+
+\subsection*{Design Problems}
+
+\begin{ExerciseList}
+\Exercise
+Run your ARM programs on an ARM emulator such as the QEMU (\url{www.qemu.org}) emulator, or $arm-elf-run$ (available at \url{www.gnuarm.com}).
+
+\end{ExerciseList}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

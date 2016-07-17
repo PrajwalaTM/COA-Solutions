@@ -1,0 +1,88 @@
+\documentclass[dvipsnames, svgnames, x11names, table]{book}
+\pdfminorversion=4
+
+\usepackage[linesnumbered,boxruled,algoruled]{myalgorithm2e}
+\usepackage{myexercise}
+\usepackage{amssymb,latexsym,amsmath,enumerate}     % Standard packages
+\usepackage{fancyvrb,url}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{tabu}
+\usepackage{svg}
+\graphicspath{{images/digital-sol/}{images/impl-sol/}}
+\newcommand{\simplerisc}{\textit{SimpleRisc }}
+
+\newcommand{\exanswer} {\noindent \textbf{Answer: } }
+\newcommand{\proof} {\noindent \textbf{Proof: } }
+\newcommand{\mc} {\mathcal}
+\newcommand{\header}[1]{ \vskip 4mm \noindent \textbf{#1} \\}
+\newcommand{\datalock}{\texttt{Data-Lock }}
+\newcommand{\branchlock}{\texttt{Branch-Lock }}
+\newcommand{\celsius}{$^\circ$C }
+\newcommand{\reg}{\textsl{reg}}
+\newcommand{\freg}{\textsl{reg}}
+\newcommand{\imm}{\textsl{imm}}
+\newcommand{\blabel}{\textsl{label}}
+\newcommand{\mem}{\textsl{mem}}
+\newcommand{\regp}{\textsuperscript{\textregistered} }
+\newcommand{\regtm}{\texttrademark}
+\renewenvironment{proof}{Proof: }{\hfill \rule{1ex}{1ex}}
+
+\title{Computer Organisation and Architecture: Solution Manual}
+\author{Smruti Ranjan Sarangi}
+
+\begin{document}
+\maketitle
+\tableofcontents
+
+\chapter{Introduction}
+\input{intro-sol}
+
+\chapter{Language of Bits}
+\input{bits-sol}
+
+\newpage
+\chapter{Assembly Language}
+\input{assembly-sol}
+
+\newpage
+\chapter{ARM Assembly Language}
+\input{arm-sol}
+
+\newpage
+\chapter{x86 Assembly Language}
+\input{x86-sol}
+
+\newpage
+\chapter{Logic Gates, Registers, and Memories}
+\input{digital-sol}
+
+\newpage
+\chapter{Computer Arithmetic}
+\input{arithmetic-sol}
+
+\newpage
+\chapter{Processor Design}
+\input{impl-sol}
+
+\newpage
+\chapter{Principles of Pipelining}
+\input{pipeline-sol}
+
+\newpage
+\chapter{The Memory System}
+\input{memory-sol}
+
+\newpage
+\chapter{Multiprocessor Systems}
+\input{multiprocs-sol}
+
+\newpage
+\chapter{I/O and Storage Devices}
+\input{io-sol}
+
+
+\end{document}

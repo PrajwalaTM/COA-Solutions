@@ -1,0 +1,571 @@
+\vskip 2cm
+
+\section*{Exercises}
+\vskip 1cm
+
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+\subsection*{Addition}
+
+\begin{ExerciseList}
+
+\Exercise
+Design a circuit to find the 1's complement of a number using half adders only. 
+
+\Exercise
+Design a circuit to find the 2's complement of a number using half adders and logic gates. 
+
+\Exercise
+Assume that the latency of a full adder is 2ns, and that of a half adder is 1ns. What is the latency
+of a 32 bit ripple carry adder?
+
+\Exercise[difficulty=1]
+Design a carry-select adder to add two n-bit numbers in $O(\sqrt{n})$ time, where
+the sizes of the blocks are $1, 2, ... ,m$ respectively.
+
+\Exercise
+Explain the operation of a carry lookahead adder.
+
+\Exercise[difficulty=1]
+Suppose there is an architecture which supports numbers in base 3 instead of base 2. Design a Carry Lookahead Adder for
+this system. Assume that you have a simple full-adder which adds numbers in base 3. 
+
+\Answer
+The following cases generate a carry:
+
+
+\begin{enumerate}
+	\item $1+2 = 10$
+	\item $2+1 = 10$
+	\item $2+2 = 11$
+\end{enumerate}
+
+$G_i = 1$ if it falls in the above 3 cases, otherwise $G_i = 0$. \\
+The following case propagates a carry:
+ 
+\begin{enumerate}
+	\item $1+1 = 2$
+\end{enumerate}
+
+$P_i = 1$ for the only above case, otherwise $P_i = 0$.\\
+The remaining things remain same as before.\\
+$P_{ij} = P_{ik}\; .\; P_{kj}$ \hspace{24 mm} $i<k<j$\\
+$G_{ij} = G_{kj}\;+\;(P_{kj}\;.\;G_{ik})$\hspace{10 mm} $i<k<j$\\ \\
+No changes are required for Ripple Carry Adder and Carry Select Adder.
+
+
+
+\Exercise[difficulty=1]
+Most of the time, a carry does not propagate till the end.
+In such cases, the correct output is available much before the worst case delay.
+Modify a ripple carry adder to consider such cases and set an output line to high as soon as
+the correct output is available.
+
+\Answer
+Defining Cumulative Carry Generate function $CG_i$ for every $i$ in Range 0 to 31:\\
+$CG_i=G_{31}\;+\;G_{30}\;+\;......\;+\;G_i$\\
+where $G_i$ is the Generate function corresponding to position $i$ in Carry Lookahead Adder.\\ The adder first computes
+all these $CG_i$ (in constant amount of time). Then as soon as a carry $C_i$ is generated for position i, the adder
+computes $(CG_{i+1}\; and \;C_i)$. If it is zero, it implies that there will be no carry propagation and generation any
+further and the output from the adder is correct now. So adder can set an output line high indicating that it has
+completed the addition.
+
+
+\Exercise[difficulty=1]
+Design an optimal adder, which uses only the propagate function, and simple
+logic operations. It should NOT use the generate function. What is its time and space complexity?
+
+\Answer
+Let there be a block (i,j). Carry out of this block $C_{i,j}$:\\
+$C_{i,j} = P_{i,j}$ + Carry generated in the block,\\
+where $P_{i,j}$ is the propagate function for block (i,j).\\
+We will use an alternative approach to get the carry generated in the block. First of all we divide the number in
+$\sqrt{n}$ blocks, each of size $\sqrt{n}$. Now we can add the numbers is a block to get the carry out. This will take
+O($\sqrt{n}$) amount of time. Calculating propagate functions will take O($\log n$) time. Now that we have the carry out
+for each block, we can add the two complete numbers. Total time taken to add is O($\sqrt{n}$).
+
+\Exercise
+Design a hardware structure to compute the sum of $m$, $n$ bit numbers. Make it run as fast as possible. Show the design
+of the structure. Compute a tight bound on its asymptotic time complexity. [NOTE: Computing the time
+complexity is not as simple as it seems].
+
+
+\Exercise[difficulty=2]
+You are given a probabilistic adder, which adds two numbers and yields the output
+ensuring that each bit is correct with probability, $a$.
+In other words, a bit in the output may be wrong with probability, $(1-a)$, and this event is independent
+of other bits being incorrect.
+How will you add two numbers using using probabilistic adders 
+ensuring that each output bit is correct with at least a probability of $b$, where $b>a$?
+
+
+\Answer
+A simple idea is to use multiple such adders in parallel. The bit at position $i$ of the final output should be the
+result of majority function of the bits at position $i$ of the outputs produced by each adder. Suppose we use $n$ adders
+in parallel (where $n$ is odd), then we have to find $n$ such that probability that at least $(n+1)/2$ bits are correct
+$\geq b$. In other words, we have to find $n$ such that \\ \\ $\sum\limits_{r=(n+1)/2}^{n} \ a^{r}.(1-a)^{n-r} \geq b$
+\\ \\
+Solving the above equation, given the values of $a$ and $b$, we will have $n\geq k$, where $k$ is some constant. The
+optimal number of adders is $ceil(k)$.
+
+\Exercise[difficulty=3]
+How frequently does the carry propagate to the end for most numbers? Answer: Very infrequently.
+In most cases, the carry does not propagate beyond a couple of bits. Let us 
+design an approximately correct adder. 
+The insight is that a carry does not propagate by more than $k$ positions 
+most of the time. Formally, we have: \\
+{\bf Assumption 1:} While adding two numbers, the largest length of a chain of propagates
+is at most $k$. \\
+
+Design an optimal adder
+in this case that has time complexity $O(log\, k)$ assuming that
+Assumption 1 holds all the time. Now design a circuit to check if assumption 1
+has ever been violated. Verma et. al.~\cite{brisk} proved that $k$ is equal to $O(log(n))$
+with very high probability. Voila, we have an exactly correct adder,
+which runs most of
+the time in $O(log(log(n)))$ time.!!! \\
+
+
+\Answer {\bf Circuit 1:}\\
+Find out the generate function for each bit. Wherever generate function $G_i = 1$, select a chunk of $k$ bits starting
+from there and compute the propagate functions for that chunk. Calculating generate function for all bits will take
+$O(1)$ time and subsequent computation for propagate function will take $O(\log k)$ time. The complete structure is
+similar to Carry Lookahead Adder except we do not need to compute generate and propagate functions for chunks larger
+than k bits in size. Addition is done in the similar way.\\ {\bf Circuit 2:}\\
+This circuit will check the carry-out from the chunks of k bits which were selected by circuit 1. If the carry-out from
+each chunk is equal to 0, then there is no error. If the carry-out from any of the chunk becomes 1, then this circuit
+reports an error and the addition is performed using different technique or by different adder.  
+
+\Exercise[difficulty=3]
+Let us consider two n bit binary numbers, $A$, and $B$. Further
+assume that the probability of a bit being equal to 1 is $p$ in $A$, and $q$ in $B$. Let
+us consider ($A + B$) as one large chunk(block).
+
+(a) What are the expected values of generate and propagate functions of this
+block as $n$ tends to $\infty$?
+
+(b) If $p = q = \frac{1}{2}$,
+ what are the values of these functions?
+(c) What can we infer from the answer to part (b) regarding the fundamental
+limits of binary addition?
+\end{ExerciseList}
+
+\section*{Multiplication}
+
+\begin{ExerciseList}
+
+\Exercise
+\label{ex:mulexec}
+Write a program  in assembly language (any variant) to multiply two unsigned 32-bit numbers given in
+registers $r0$ and $r1$ 
+and store the product in registers $r2$ (LSB) and $r3$ (MSB). Instead of using the multiply
+instruction, simulate the algorithm
+of the iterative multiplier. 
+
+\Answer Code:
+\begin{Verbatim}[frame=single]
+L1:
+	and r5, r3, #1
+	cmp r5, #1
+	addeq r2, r2, r0
+	and r5, r2, #1
+	mov r2, r2, lsr #1
+	mov r3, r3, lsr #1
+	cmp r5, #1
+	addeq r3, r3, #0x80000000
+	add r4, r4, #1
+	cmp r4, #32
+	bne L1
+	mov pc, lr
+multiply:
+	mov r2, #0
+	mov r3, r1
+	mov r4, #0
+	bl L1
+\end{Verbatim}
+
+
+\Exercise
+Extend the solution to Exercise~\ref{ex:mulexec} for 32 bit signed integers.
+
+\Answer
+If a number is negative, take 2's compliment of it to make it positive. Do usual unsigned multiplication for the two
+31-bit positive numbers to get the positive product. Calculate the sign of the product from the sign of the initial
+multiplicand and initial multiplier : product is negative if and only if their signs are different. If the final product
+is positive, leave it as it is, otherwise, take 2's compliment of the product.
+
+\Exercise[difficulty=1]
+Normally, in the Booth's algorithm, we consider the current bit, and the previous bit. Based on these two values, we
+decide whether we need to add or subtract a shifted version of the multiplicand. This is known as the radix-2 Booth's
+algorithm, because we are considering two bits at one time. There is a variation of Booth's algorithm, called radix-4
+Booth's algorithm in which we consider 3 bits at a time. Show how this algorithm is faster than the original radix-2
+Booth's algorithm. How will you implement this algorithm ?
+
+\Answer
+In this algorithm, we consider 3 bits at a time in a block, each block overlaps the previous block by 1 bit. We start
+making groups from LSB and proceed towards MSB. Thus, by doing this, we essentially halve the number of groups formed;
+since each alternate bit is now covered by only 1 group, while each bit (except for LSB and MSB) previously (in radix-2)
+was covered by 2 groups. Following are the possibilities of the bit pattern in a group and corresponding product P.
+Assume that the MSB of the group is at position i. Let M be the multiplicand.\\ 
+
+\begin{tabular}{|l|c|}
+\hline
+Block & $P$ \\
+\hline \hline
+000 &	$P$ \\
+\hline
+001	& $P + 2^{i-1} * M$ \\
+\hline
+010	& $P + 2^{i-1} * M$ \\
+\hline
+011	& $P + 2^{i} * M$ \\
+\hline
+100	& $P - 2^{i} * M$ \\
+\hline
+101	& $P -2^{i-1} * M$\\
+\hline
+110	& $P -2^{i-1} * M$ \\
+\hline
+111	& $P$ \\
+\hline
+\end{tabular} \\
+
+** Take care of boundary cases of LSB and MSB
+
+\Exercise[difficulty=1]
+Assume that in the sizes of the $U$ and $V$ registers are 32 bits in a 32 bit Booth multiplier. Is it possible to have an
+overflow? Answer the question with an example. [HINT: Can we have an overflow in the first iteration itself?]
+
+\Exercise[difficulty=1]
+Prove the correctness of the Booth multiplier in your own words.
+
+\Exercise
+Explain the design of the Wallace tree multiplier. What is its asymptotic time complexity.
+
+\Exercise[difficulty=2] Design a Wallace tree multiplier to multiply two signed 32 bit numbers, and save the result in a 32 bit
+register. How do we detect overflows in this case?
+
+
+\end{ExerciseList}
+
+\section*{Division}
+
+\begin{ExerciseList}
+
+\Exercise Implementation of division using an assembly program.
+\begin{enumerate}
+\item[i) ] Write an assembly program for restoring division.
+\item[ii) ] Write an assembly program for non-restoring division.
+\end{enumerate}
+
+\Answer Restoring division:
+\begin{Verbatim}[frame=single]
+L1:
+	and r3, r8, #0x80000000
+	mov r8, r8, lsl #1
+	mov r7, r7, lsl #1
+	cmp r3, #0
+	addne r7, r7, #1
+	cmp r7, r1
+	subge r7, r7, r1
+	addge r8, r8, #1
+	add r4, r4, #1
+	cmp r4, #32
+	bne L1
+	mov pc, lr
+divideRestore:
+	mov r8, r0
+	mov r4, #0
+	bl L1
+\end{Verbatim}
+
+
+Non-restoring division:
+\begin{Verbatim}[frame=single]
+L1:
+	and r3, r8, #0x80000000
+	mov r8, r8, lsl #1
+	mov r7, r7, lsl #1
+	cmp r3, #0
+	addne r7, r7, #1
+	cmp r7, #0
+	subge r7, r7, r1
+	addlt r7, r7, r1
+	cmp r7, #0
+	addge r8, r8, #1
+	add r4, r4, #1
+	cmp r4, #32
+	bne L1
+	cmp r7, #0
+	addlt r7, r7, r1
+	mov pc, lr
+divideNonRestore:
+	mov r8, r0
+	mov r4, #0
+	bl L1
+\end{Verbatim}
+
+\Exercise[difficulty=1]
+Design an $O(log(n)^k)$ time algorithm to find out if a number is divisible by 3. Try to minimise $k$. 
+
+\Answer
+If a number is divisible by 3, the absolute value of difference of the sum of bits at odd position and even positions is 
+divisible by 3. \\
+That is:\\
+A number n is divisible by 3 iff:\\
+$(\sum b_{2k+1} - \sum b_{2k})$ MOD $3 =0$\\
+where $b_i$ is a bit of n at position i.\\
+or,\\
+$((b_1-b_0) + (b_3-b_2) + (b_5-b_4) + (b_7-b_6) .... )$ MOD 3 $= 0$\\
+$\Rightarrow (((b_1-b_0)$ MOD 3 $+ (b_3-b_2)$ MOD 3$)$ MOD 3 $+ ((b_5-b_4)$ MOD 3 $+ (b_7-b_6)$ MOD 3$)$ MOD 3 $.... )$ MOD 3 $= 0 $\\ ...and so on.
+So essentially, we build a circuit which calculates $(b_{2k+1} - b_{2k})$ MOD 3 in the first step, and then combines the
+result by adding the subsequent pairs modulo 3, until a final result is obtained. If this final result in 0, the number
+is divisible by 3.\\
+The following figure shows an example of an 8 bit number $(11100111)_2$ through our circuit:\\
+
+\begin{center}
+%\includegraphics[bb=0 0 200 350,scale=0.5]{div3.png}
+\end{center}
+
+Total number of levels in the circuit = $log_2(n)$\\
+Therefore, $k=1$;
+
+\Exercise[difficulty=1]
+Design an $O(log(n)^k)$ time algorithm to find out if a number is divisible by 5. Try to minimise $k$. 
+
+\Exercise[difficulty=2]
+Design a fast algorithm to compute the remainder of the division of an unsigned number
+by a number of the form ($2^m + 1$). What is its asymptotic time complexity?
+
+\Exercise[difficulty=2]
+Design a fast algorithm to compute the remainder of the division of an unsigned number
+by a number of the form ($2^m - 1$). What is its asymptotic time complexity?
+
+\Exercise[difficulty=2]
+Design an $O((log(uv))^2)$ algorithm to find the greatest common divisor of two binary numbers $u$ and $v$.
+[HINT: The gcd of two even numbers $u$ and $v$ is $2*gcd(u/2,v/2)$]
+\Answer
+The algorithm, also known as Stein's algorithm is as follows:
+
+\begin{enumerate}
+	\item[1. ] $gcd (v, v) = v$
+	\item[2. ] $gcd(0, v) = v$, and $gcd(u, 0) = u$ 
+	\item[3. ] If $u$ and $v$ are both even, then $gcd(u, v) = 2\:.\:gcd(u/2, v/2)$
+	\item[4. ] If $u$ is even and $v$ is odd, then $gcd(u, v) = gcd(u/2, v)$, because $2$ is not a common divisor. Similarly for the other case, then $gcd(u, v) = gcd(u, v/2)$.
+	\item[5. ] If $u$ and $v$ are both odd:
+	\begin{enumerate}
+		\item[i) ] If $u \geq v$, then $gcd(u, v) = gcd((u - v)/2, v)$ 
+		\item[ii) ] If $u < v$, then $gcd(u, v) = gcd((v - u)/2, u)$
+	\end{enumerate}
+\end{enumerate}
+Each step reduces at least one of the operand by at least a factor of two.  Thus, this algorithm runs in
+$O((log(uv))^2)$ in worst case. Or in other words, this algorithm takes time proportional to square of number of bits in
+$u$ and $v$ together. 
+
+
+\end{ExerciseList}
+
+\section*{Floating Point Arithmetic}
+
+\begin{ExerciseList}
+
+\Exercise
+Give the simplest possible algorithm to compare two 32 bit IEEE 754 floating point numbers. Do not consider $\pm
+\infty$, NAN, and (negative 0).  Prove that your algorithm is correct. What is its time complexity ?
+
+\Answer
+Just compare the numbers like integers. IEEE 754 floating point numbers have their 1st bit as sign bit (which is same as
+integers), next 8 bits store the exponent and the last 23 bits store mantissa. When we compare two fractions, we first
+check the sign, then the exponent and finally the mantissa. If the signs are different, the comparison is done and the
+positive one is greater (which is done correctly by comparing them as normal integers). If the two fractions are
+positive, the one with greater exponent will be greater. This again will be done correctly by normal integer comparison
+as exponent is placed to the left of mantissa. If the two fractions are negative, the one with greater exponent is
+smaller, again done correctly by integer comparison: negative integer with higher first 8 bits after MSB is smaller.
+Then comes the mantissa which is also checked correctly by integer comparison. \\ Time complexity = O(log n) taken for
+subtraction and sign comparison, where n is the number of bits.
+
+
+
+\Exercise 
+Design a circuit to compute $\lceil log_2(n) \rceil$. What is its asymptotic time complexity?
+
+\Exercise $A$ and $B$, are saved in the computer as $A'$ and $B'$. Neglecting any further truncation or roundoff errors, show that the relative error of the product is approximately the sum of the relative errors of the factors.  \Answer Let $\alpha$ be the relative error in $A'$ and $\beta$ be the relative error in $B'$. \\ So, $|\alpha| < 1$ and $|\beta| < 1$ \\ $A=A' * (1+\alpha) \\ B=B' * (1+\beta) \\ A*B = A'B' * ( 1+ \alpha + \beta + \alpha\beta) \\ = A'B' * (1+\alpha+\beta)(1+\alpha\beta/(1+\alpha+\beta)) \\ $
+Since $\alpha$ and $\beta$ are small quantities with absolute value less than 1, $\alpha\beta / (1+\alpha+\beta) \longrightarrow 0$\\
+Therefore, \\
+$A*B \approx A'B' * (1+ (\alpha+\beta))\\
+		= A'B' *(1+\delta) $\\
+where $\delta = \alpha + \beta$
+
+\Exercise
+Show the flowchart for floating point addition.
+
+\Exercise
+Show the flowchart for floating point multiplication.
+
+\Exercise
+Can we use regular floating point division for dividing integers also? If not, then how can we modify the algorithm
+for performing integer division? 
+
+\Exercise
+Describe in detail how the ``round to nearest'' rounding mode is implemented.
+
+\Exercise[difficulty=3]
+We wish to compute the square root of a floating point number in hardware using the Newton-Raphson method.
+Outline the details of an algorithm, prove it, and compute its computational complexity.
+Follow the following sequence of steps. 
+
+\begin{enumerate}
+\item Find an appropriate objective function. 
+\item Find the equation of the tangent, and the point at which it intersects the x-axis. 
+\item Find an error function. 
+\item Calculate an appropriate initial guess for $x$. 
+\item Prove that the magnitude of the error is less than 1.
+\item Prove that the error decreases at least by a constant factor per iteration. 
+\item Evaluate the asymptotic complexity of the algorithm. 
+\end{enumerate} 
+
+\Answer 
+\begin{enumerate}
+\item Objective function: $f(x) = x^2 - b$
+Assume that $1/2 \le b < 2$. Any floating point number in the normal form can be brought to this form by
+rounding the exponent to the nearest even number. Example. $1.5 \times 2^{-3} = 0.75 \times 2^{-2}$. 
+\item Slope = 2x. Point at which the tangent intersects the x-axis ($x_2$):
+\begin{equation}
+\begin{split}
+\frac{x_1^2 - b}{x_1 - x_2} = 2x_1 \\
+\Rightarrow x_2 = \frac{x_1^2 + b}{2x_1} 
+\end{split}
+\end{equation}
+\item Error function:  $E(x)  = x - \sqrt{b}$
+\begin{equation}
+\begin{split}
+E(x_2) & = x_2 - \sqrt{b} \\
+       & = \frac{x_1^2 + b}{2x_1} - \sqrt{b} \\
+       & = \frac{x_1^2 + b - 2x_1\sqrt{b}}{2x_1} \\
+       & = \frac{(x_1 - \sqrt{b})^2}{2x_1} \\
+       & = \frac{E(x_1)^2}{2x_1}
+\end{split}
+\end{equation}
+\item Initial guess for $x$: x = 1
+
+\item Initial value of the error: $1 - \sqrt{b}$. 
+\[
+(1/2 \le b < 2) \Rightarrow (1 - \sqrt{2}) < (1 - \sqrt{b}) \le (1 - 1/\sqrt{2}) 
+\]
+Hence, $\mid 1 - \sqrt{b} \mid < 1$
+\item 
+Let us prove by induction that $x_n \ge 1/2$, and $b \ge x_n / 2$. 
+This is true for the base case $x_1 = 1$. 
+
+Assume the hypothesis is true for $x_n = x'$.
+Let us try to prove that the hypothesis holds for $x_{n+1} = x''$.
+
+\begin{equation}
+\begin{split}
+x'' & = \frac{x'^2 + b}{2x'} \\
+   & = \frac{x'}{2} + \frac{b}{2x'} 
+\end{split}
+\end{equation}
+
+Now, $x'/2 \ge 1/4$ (because, $x' \ge 1/2$), and $b/2x' \ge 1/4$ (because $b \ge x' / 2$).
+Hence, $x'' \ge 1/2$.
+
+Let us now prove that $b \ge x''/2$. We have:
+
+\begin{equation}
+\begin{split}
+ & b \ge x''/2  \\
+\Leftrightarrow & b \ge \frac{x'^2 + b}{4x'} \\
+\Leftrightarrow & b \ge \frac{x'}{4} + \frac{b}{4x'} \\
+\end{split}
+\end{equation} 
+
+By the induction hypothesis, $b/2 \ge x'/4$. 
+If we prove that $b/2 \ge b/4x'$, we are done.
+
+\begin{equation}
+\begin{split}
+& \frac{b}{2} \ge  \frac{b}{4x'} \\
+\Leftrightarrow & 1 \ge \frac{1}{2x'} \\
+\Leftrightarrow & x' \ge \frac{1}{2} (TRUE) \\ 
+\end{split}
+\end{equation}
+
+
+We have thus proved the induction, and we can conclude that $x_n \ge 1/2$ for all values of $n$. 
+Hence, $\forall n,2x_n \ge 1$.
+We thus have: 
+\[
+E(x_{n+1}) \le E(x_n)^2 
+\]
+
+\item We have $log(n)$ steps because, we assume that the precision is till $n$ bits. In each step, 
+we have to do a left shift and round (log(n)), addition (log(n)), and division ($log(n)^2$).
+
+Thus, the total time complexity is \fbox{$O(log(n)^3)$}
+\end{enumerate}
+
+\noindent {\bf Note to TAs:} : (a and b) should have a reduced form of $b$  (1 mark) (c) 1 mark
+(d and e) 1 mark (f) 4 marks (g) 1 mark. Take a look at part (f) carefully, it is the crux of the algorithm.
+The proof should be crystal clear (for full marks). If there is any ambiguity, the benefit of doubt goes to the TA.
+For this answer, we need to assume that the time complexity of a division is $O(log(n)^2)$ (This is a research
+question). 
+
+\end{ExerciseList}
+
+\section*{Design Problems}
+\begin{ExerciseList}
+
+\Exercise
+Implement an adder, multiplier, in a hardware description language such as VHDL or Verilog.
+
+\Exercise
+Extend your design for implementing floating point addition and multiplication.
+
+\Exercise
+Read about the SRT division algorithm, comment on its computational complexity, and try to implement it in
+VHDL/Verilog.
+\end{ExerciseList}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

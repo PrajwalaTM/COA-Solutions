@@ -1,0 +1,398 @@
+\section*{Exercises}
+\vskip 1cm
+
+\setcounter{Exercise}{0}
+\setcounter{Answer}{0}
+
+
+\section*{Boolean Logic}
+
+\begin{ExerciseList}
+
+\Exercise
+$A$, $B$, $C$ and $D$ are Boolean variables. Prove the following results:
+
+\begin{enumerate}[a) ]
+\item
+$A.B + \overline{A}.B + \overline{B}.C + \overline{B}.\overline{C} = 1$
+\item
+$(\overline{A} + \overline{B}).(\overline{A}+B).(A + \overline{B}.D+C) = \overline{A}.\overline{B}.D+\overline{A}.C$
+\item
+$\overline{\overline{A}.\overline{B}+\overline{B}.C} = A.\overline{C} + B$
+\item
+$A.\overline{B} + \overline{A}.\overline{B} + A.\overline{B}.C.D = \overline{B}$
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}[a) ]
+\item
+LHS $= B.(A+\overline{A}) + \overline{B}.(C+\overline{C}) = B + \overline{B} =1$
+\item
+LHS $= \overline A.(1 + B + \overline B)(A + \overline{B}.D+C) = \overline{A}.\overline{B}.D+\overline{A}.C$
+\item
+LHS $= (A + B).(B + \overline C) = A.B + B + A.\overline C = B + A.\overline C$
+\item
+LHS $= \overline B.(A + \overline A) + A.\overline B.C.D = \overline B.(1+A.C.D) = \overline B$
+
+\end{enumerate}
+
+\Exercise 
+Construct a circuit to compute the following functions using only NOR gates.
+\begin{enumerate}[a)]
+\item $overline{A}$
+\item $A+B$
+\item $A.B$
+\item $A \oplus B$
+\end{enumerate}
+
+\Exercise 
+Construct a circuit to compute the following functions using only NAND gates.
+\begin{enumerate}[a)]
+\item $overline{A}$
+\item $A+B$
+\item $A.B$
+\item $A \oplus B$
+\end{enumerate}
+
+\Exercise[difficulty=2]
+Prove that any Boolean function can be realised with just NAND or NOR gates.
+[HINT: Use the idea of decomposing a function into its set of minterms.]
+
+\Exercise 
+Why are the first and last rows or columns considered to be adjacent in a Karnaugh Map?
+
+\Exercise
+Minimise the following Boolean functions using a Karnaugh Map.
+\begin{enumerate}[a)]
+\item $ABC + AB\overline{C} + \overline{A}BC$
+\item $ABCD + A\overline{BC}D + A\overline{D}$
+\end{enumerate}
+
+\Exercise[difficulty = 1]
+Consider the Karnaugh map of the function $A_1 \oplus A_2 \ldots \oplus A_n$. Prove that
+it looks like a chess board. Why cannot we minimise this expression further?
+
+\end{ExerciseList}
+
+
+\section*{Integer Number Systems}
+
+\begin{ExerciseList}
+\Exercise
+Convert the following 8 bit binary numbers in 1's complement form to decimal.
+\begin{enumerate}[a) ]
+\item
+01111101
+\item
+10000000
+\item
+11111111
+\item
+00000000
+\item
+11110101
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}[a) ]
+\item
+125
+\item
+-127
+\item
+0
+\item
+0
+\item
+-10
+\end{enumerate}
+
+
+\Exercise
+Convert the following unsigned numbers (in the given base) to decimal:
+\begin{enumerate}[a) ]
+\item
+$(243)_5$
+\item
+$(77)_8$
+\item
+$(FFA)_{16}$
+\item
+$(100)_4$
+\item
+$(55)_6$
+\end{enumerate}
+
+\Answer:
+\begin{enumerate}[a) ]
+\item
+73
+\item
+63
+\item
+4090
+\item
+16
+\item
+35
+\end{enumerate}
+
+\Exercise
+Do the following calculations on unsigned binary numbers and write the result as an unsigned binary number.
+\begin{enumerate}[a) ]
+\item
+$1100110101 + 1111001101$
+\item
+$110110110 + 10111001$
+\item
+$11101110 - 111000$
+\item
+$10000000 - 111$
+\end{enumerate}
+ 
+
+\Answer:
+\begin{enumerate}[a) ]
+\item
+11100000010
+\item
+1001101111
+\item
+10110110
+\item
+1111001
+\end{enumerate}
+
+\Exercise
+What are the pros and cons of the 1's complement number system?
+
+\Exercise
+What are the pros and cons of the sign-magnitude number system?
+
+\Exercise
+What is a number circle? How is it related to the 2's complement number system? 
+
+\Exercise
+What does the point of discontinuity on the number circle signify?
+
+\Exercise 
+Why is moving $k$ steps on the number circle in a clockwise direction
+equivalent to moving $2^n$ - $k$ steps in an anti-clockwise direction? 
+Assume that the number circle contains $2^n$ nodes.
+
+\Exercise
+What are the advantages of the 2's complement notation over other number systems?
+
+\Exercise
+Outline a method to quickly compute the 2's complement of a number.
+
+\Exercise
+Prove the following result in your own words:
+    \begin{equation}
+		\mc{F}(u - v) \equiv \mathcal{F}(u) + (2^n - \mathcal{F}(v))
+	\end{equation}
+
+\Exercise
+Let us define {\em sign contraction} to be the reverse of sign extension. What are the rules
+for converting a 32 bit number to a 16 bit number by using sign contraction? Can we do this
+conversion all the time without losing information?
+
+\Exercise
+What are the conditions for detecting an overflow while adding two 2's complement numbers?
+
+\end{ExerciseList}
+
+\section*{Floating Point Number System}
+\begin{ExerciseList}
+\Exercise
+Describe the IEEE 754 format.
+
+\Exercise
+Why do we avoid representing the bit to the left of the decimal point in the significand?
+
+\Exercise
+Define denormal numbers. How do they help to extend the range of normal floating point numbers?
+
+\Exercise
+In the standard form of a denormal number, why is the exponent term equal to $2^{-126}$? Why is
+it not equal to $2^{-127}$?
+
+\Exercise
+Convert the following floating point numbers into the IEEE 32 bit 754 format. Write your answer in the
+hexadecimal format.
+\begin{enumerate}[a) ]
+\item $-1 * (1.75 * 2^{-29} + 2^{-40} + 2^{-45})$
+\item $52$
+\end{enumerate}
+
+\Answer :
+\begin{enumerate}[a) ]
+\item 0xB1601080
+\item 0x42500000
+\end{enumerate}
+
+\Exercise
+What is the range of positive and negative denormalised floating point numbers numbers?
+\Answer Range:
+\begin{itemize}
+\item Positive denormalised numbers: $2^{-149}$ to $(2^{-126} - 2^{-149})$
+\item Negative denormalised numbers: $-(2^{-126} - 2^{-149})$ to $-2^{-149}$
+\end{itemize}
+
+
+
+\Exercise
+What will be the output of the following code snippet assuming that the fractions are stored in IEEE 32 bit 754 format:
+\begin{Verbatim}[frame=single]
+float a=pow(2,-50);
+float b=pow(2,-74);
+float d=a;
+for(i=0; i<100000; i++)
+{
+	d=d+b;
+}
+if(d>a) 
+	printf("%d",1);
+else
+	printf("%d",2);
+\end{Verbatim}	
+
+\Answer 2
+
+\Exercise
+We claim that the IEEE 754 format represents real numbers approximately. Is this statement
+correct?
+
+\Exercise[difficulty=1]
+Prove that it is not possible to exactly represent $\sqrt{2}$ even if we have an indefinitely
+large number of bits in the mantissa.
+
+\Exercise[difficulty=1]
+How does having denormal numbers make floating point mathematics slightly more intuitive?
+
+\Exercise[difficulty=1]
+What is the correct way for comparing two floating point numbers for equality?
+
+
+\Exercise[difficulty=2]
+Assume that the exponent $e$ is constrained to lie in the range $0 \leq e \leq X$ with a bias of $q$ , and the base is $b$ . The
+significand is $p$ digits in length.
+Use an IEEE 754 like encoding. However,
+you need to devote one digit to store the value to the left of the decimal point in the significand.
+
+\begin{enumerate}[a) ]
+\item What are the largest and smallest positive values that can be written in normalised form.
+\item What are the largest and smallest positive values that can be written in denormalised form.
+\end{enumerate}
+
+\Answer Since the base is b, the most significant digit may not be just 0 or 1, so it will be included in the significand. Therefore, the fraction representation will have 1 digit before decimal, and p-1 digits after decimal point. The valid range of the exponent is 1 to $X-1$. 
+
+\begin{enumerate}[a) ]
+\item Largest positive normalised value:
+The largest significand is: $(b-1).\underbrace{(b-1) .... (b-1)}_{p-1}$.
+This is equal to $(b-1) \times (1 + b^{-1} + \ldots + b^{-(p-1)})$ = $(b - b^{-p+1})$. 
+The largest value of the exponent is $X - 1 - q$. Thus the largest normalised value is
+\fbox{$(b - b^{-p+1}) \times b^{X - 1 - q}$}. 
+
+Smallest positive normalised value = \fbox{$b^{1-q}$} because the smallest possible
+significand is $1.\underbrace{00000}_{p-1}$. 
+
+\item Largest positive denormalised value : 
+Largest positive significand with 0 before the decimal point is: $0.\underbrace{(b-1) \ldots (b-1)}_{p-1}$ 
+= $(b^{-1} + \ldots b^{-(p-1)}$ = $ (1 - b^{-(p-1)})$. The exponent in a denormalised number: $b^{1-q}$.
+Thus, the largest positive denormalised number is \fbox{$(1 - b^{-(p-1)}) \times b^{1-q}$}. 
+
+Smallest positive denormalised value = \fbox{$ b^{1-q} * b^{-(p-1)} = b^{2 - p - q}$}
+\end{enumerate}
+
+
+\Exercise[difficulty=1]
+Most of the floating point numbers cannot be represented accurately in hardware due to
+ the loss of precision. However, if we choose some other representation, we can 
+represent certain kinds of floating point numbers without error.
+
+\begin{enumerate}[a) ]
+\item Give a representation for storing rational numbers accurately.
+Devise a normalised form for it. 
+
+\item Can other floating point numbers such as $\sqrt{2}$  be represented in a similar way?
+\end{enumerate}
+
+\Answer  --
+
+\begin{enumerate}[a) ]
+\item
+Use 1 bit for the sign (S), and use 16 bits for the numerator, and 16 bits for the denominator. These are 
+positive unsigned numbers. 
+
+The normal form is: 
+\[
+	(-1)^S \times \frac{a}{b} 
+\]
+Here, $b \ne 0$. $a$ and $b$ are coprime.
+
+\item
+We cannot represent $\sqrt{2}$ because it is not a rational number.
+\end{enumerate}
+
+\Exercise 
+Design a floating point representation, for a base 3 system on the lines of the IEEE 754 format.
+
+\Answer
+Each digit can be either 0, 1 or 2. The numbers will have a sign bit $(S)$ which can be 0 or 1.
+Let us use 8 digits to represent the exponent ($E$). The bias of the exponent can be $(3^8 - 1)/2$ = 3280.
+We need to one digit to represent the digit at the left of the decimal point. We can no longer use
+a default value of 1. Thus the mantissa will thus contain (32 - 1 - 8 - 1 = 22) digits.
+
+The normalised form of the  floating point number is:
+
+\[
+A = (-1)^S D.M \times 3^{(E - bias)}
+\]
+
+bias = 3280, $D \in (1,2)$, $0 \le M < 3$, $1 \le E \le 3^8 - 2$. 
+
+\begin{itemize}
+\item
+A is 0 if:\\
+$D=0$, $M=0$ and $E=0$
+\item
+A is $+\infty$ if:\\
+$S=0$,  $E=3^8-1$ and $M=0$
+\item
+A is $-\infty$ if:\\
+$S=1$,  $E=3^8-1$ and $M=0$
+\item
+A is NAN if: \\
+$E = 3^8 - 1$, and $M \ne 0$
+\item
+Denormalised form:\\
+$D=0$, $M \ne 0$ and $E=0$
+\end{itemize}
+
+\end{ExerciseList}
+\section*{Strings}
+
+\begin{ExerciseList}
+\Exercise
+Convert the string ``459801'' to ASCII. The ASCII representation of 0 is 0x30.
+Assume that all the numbers are represented in the ASCII format in sequence.
+
+\Answer 
+ASCII : 00110100 00110101 00111001 00111000 00110000 00110001
+
+\Exercise
+Find the Unicode representation for characters in a non-English language, and compare
+it with the ASCII encoding.
+
+\end{ExerciseList}
+
+\section*{Design Problems}
+\begin{ExerciseList}
+\Exercise
+In this section, we have minimised Boolean expressions using Karnaugh maps. We solved
+all our examples manually. This method is not scalable for expressions containing
+hundreds of variables. Study automated techniques for minimising Boolean expressions
+such as the Quinn-McCluskey tabulation method. Write a program to implement this method.
+
+\end{ExerciseList}
